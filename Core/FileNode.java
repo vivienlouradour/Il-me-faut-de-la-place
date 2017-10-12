@@ -6,6 +6,11 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 
 public class FileNode extends Node {
+
+    public FileNode(File file){
+        super(file);
+    }
+
     @Override
     public ArrayList<File> doublons() {
         return null;

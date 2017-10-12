@@ -11,5 +11,8 @@ public class FabriqueNode {
         File file = new File(racine);
         if(!file.exists())
             throw new IllegalArgumentException("Le chemin spécifié n'existe pas");
+        if(file.isDirectory())
+            return new DirectoryNode(file);
+        return new FileNode(file);
     }
 }

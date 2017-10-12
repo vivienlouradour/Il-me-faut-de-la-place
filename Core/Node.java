@@ -5,6 +5,14 @@ import java.io.File;
 public abstract class Node implements INode{
     private File file;
 
+    protected Node(File file){
+        this.file = file;
+    }
+
+    public File getFile(){
+        return this.file;
+    }
+
     //Services
     @Override
     public String fileName() {
