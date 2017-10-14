@@ -7,14 +7,20 @@ import java.util.ArrayList;
 
 public class DirectoryNode extends Node {
     private ArrayList<INode> childs;
-    FabriqueNode fabrique = new FabriqueNode();
 
     protected DirectoryNode(File file){
         super(file);
         childs = new ArrayList<INode>();
         for (File fileToAdd : file.listFiles()) {
-            childs.add(fabrique.tree(fileToAdd.getAbsolutePath()));
+            this.addChild(fileToAdd);
         }
+    }
+
+    protected void addChild(File file){
+        if(file.isDirectory())
+            this.childs.add(new DirectoryNode(file));
+        else
+            this.childs.add(new FileNode(file));
     }
 
     @Override
