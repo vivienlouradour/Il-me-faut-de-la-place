@@ -1,31 +1,17 @@
-package Core;
+package core;
 
+import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
 
-public abstract class Node implements INode{
-    private File file;
-
-    protected Node(File file){
-        this.file = file;
-    }
-
-    public File getFile(){
-        return this.file;
-    }
-
-    //Services
-    @Override
-    public String fileName() {
-        return this.file.getName();
-    }
-
-    @Override
-    public long size() {
-        return this.file.length();
-    }
-
-    @Override
-    public String absolutePath() {
-        return this.file.getAbsolutePath();
-    }
+public interface Node {
+    public ArrayList<File> doublons();
+    public DefaultTreeModel modelTree();
+    public String fileName();
+    public byte[] getHash();
+    public long length();
+    public String absolutePath();
+    public ArrayList<Node> getChilds();
+    public Node filter(ArrayList<FileFilter> filtres);
 }
