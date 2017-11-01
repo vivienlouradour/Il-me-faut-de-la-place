@@ -12,7 +12,7 @@ public class HashTest {
 
     public static void main(String[] args){
         long debut = System.currentTimeMillis();
-        file = new File("C:\\test\\ubuntu-16.04.2-desktop-amd64.iso");
+        file = new File("D:\\Machine Debian pour Marionnet\\Marionnet-IUT_Orsay_2016.ova");
         System.out.println(hash());
         System.out.println("Temps de construction : " + (System.currentTimeMillis() - debut));
     }

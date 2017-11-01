@@ -1,9 +1,7 @@
 package Core;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
@@ -28,7 +26,7 @@ public class Api {
             throw new IllegalArgumentException("Le fichier spécifié n'existe pas");
 
         //Point de départ de l'arbre
-        CustomTreeNode root = new CustomTreeNode(new FileNode(fileRoot));
+        CustomTreeNode root = new CustomTreeNode(fileRoot);
 
         //Déclaration du thread chargé de construire l'arbre
         //En l'état, le thread est inutile. A voir par la suite faire autant de thread que le nombre de cores du CPU
@@ -40,28 +38,54 @@ public class Api {
         try {
             thread.join();
         } catch (InterruptedException e) {
-            System.out.println("C'est ici !");
             e.printStackTrace();
         }
         return root;
     }
 
     public CustomTreeNode filterTree(CustomTreeNode originalTree, String filterPatern){
-        return null;
+        FileFiltering fileFiltering = new FileFiltering(filterPatern);
+        CustomTreeNode newTree = (CustomTreeNode)originalTree.clone();
+        if(originalTree.getCurrentFile().isFile()) {
+            if(fileFiltering.isValid(originalTree.getCurrentFile()))
+                return newTree;
+            else
+                return null;
+        }
+        else{
+            Enumeration en = newTree.depthFirstEnumeration();
+            while (en.hasMoreElements()) {
+                CustomTreeNode node = (CustomTreeNode)en.nextElement();
+                CustomTreeNode q = this.filterTree(node, filterPatern);
+                if(q != null)
+                    newTree.add(q);
+            }
+        }
+
+
+
+        return newTree;
     }
 
-    public Map<String, List<FileNode>> getDoublons(CustomTreeNode tree){
-        HashMap<String, List<FileNode>> hashMap = new HashMap<String, List<FileNode>>();
+
+    /**
+     * Retourne une map (clé,valeurs).
+     * La clé correspond au hash du fichier, la valeur correspond à une liste des fichiers identiques (ayant le même hash)
+     * @param tree racine de l'arbre à analyser
+     * @return HashMap des doublons
+     */
+    public HashMap<String, List<File>> getDoublons(CustomTreeNode tree){
+        HashMap<String, List<File>> hashMap = new HashMap();
 
         Enumeration en = tree.depthFirstEnumeration();
         while (en.hasMoreElements()) {
             CustomTreeNode node = (CustomTreeNode)en.nextElement();
-            FileNode fileNode = node.getCurrentFileNode();
-            String hash = hash(fileNode.getFile());
+            File fileNode = node.getCurrentFile();
+            String hash = hash(fileNode);
             if(hash == null)
                 continue;
             if(!hashMap.containsKey(hash)) {
-                ArrayList<FileNode> array = new ArrayList<>();
+                ArrayList<File> array = new ArrayList<>();
                 array.add(fileNode);
                 hashMap.put(hash, array);
             }

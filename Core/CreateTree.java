@@ -24,7 +24,7 @@ class CreateTree implements Runnable{
 
         for (File file : files) {
             CustomTreeNode childNode =
-                    new CustomTreeNode(new FileNode(file));
+                    new CustomTreeNode(file);
             node.add(childNode);
             if (file.isDirectory()) {
                 createChildren(file, childNode);

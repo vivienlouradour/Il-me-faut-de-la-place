@@ -1,13 +1,9 @@
 package IHM;
 
 import Core.CustomTreeNode;
-import Core.FileNode;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Test extends JFrame{
@@ -26,13 +22,18 @@ public class Test extends JFrame{
         //Récupère les doublons
         debut = System.currentTimeMillis();
         Map doublons = api.getDoublons(root);
-        System.out.println("Temps de construction : " + (System.currentTimeMillis() - debut));
-        System.out.println("Racine : " + root.getCurrentFileNode().absolutePath());
+        System.out.println("Temps de hash : " + (System.currentTimeMillis() - debut));
+        System.out.println("Racine : " + root.getCurrentFile().getAbsolutePath());
         System.out.println(root.length());
 
+        //Trie l'arbre
+        debut = System.currentTimeMillis();
+        CustomTreeNode filteredRoot = api.filterTree(root, ".*(\\.txt)");
+        System.out.println("Temps de filtre : " + (System.currentTimeMillis() - debut));
 
         //Construction de l'IHM de test
-        DefaultTreeModel treeModel = new DefaultTreeModel(root);
+        //DefaultTreeModel treeModel = new DefaultTreeModel(root);
+        DefaultTreeModel treeModel = new DefaultTreeModel(filteredRoot);
         JTree tree = new JTree(treeModel);
         tree.setShowsRootHandles(true);
         JScrollPane scrollPane = new JScrollPane(tree);
