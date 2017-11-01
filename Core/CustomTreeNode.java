@@ -1,4 +1,4 @@
-package core;
+package Core;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -16,6 +16,10 @@ public class CustomTreeNode extends DefaultMutableTreeNode {
         return (FileNode)this.getUserObject();
     }
 
+    /**
+     * Renvois l'arborescence sous forme d'ArrayList
+     * @return
+     */
     public ArrayList<CustomTreeNode> getChilds(){
         ArrayList<CustomTreeNode> arrayList = new ArrayList<>();
         Enumeration<CustomTreeNode> enumeration = this.children();
@@ -35,11 +39,16 @@ public class CustomTreeNode extends DefaultMutableTreeNode {
     }
 
 
+    /**
+     * Retourne une map (clé,valeurs).
+     * La clé correspond au hash du fichier, la valeur correspond à une liste des fichiers identiques (ayant le même hash)
+     * @return Map des doublons
+     */
     public Map<String, List<FileNode>> doublons() {
         List<FileNode> listFiles = this.toFileNodeArrayList();
 
         Map<String, List<FileNode>> doublons =
-                listFiles.stream().collect(Collectors.groupingBy(w -> Arrays.toString(w.getHash())));
+                listFiles.stream().collect(Collectors.groupingBy(file -> file.getHash() == null ? "null" : file.getHash()));
 
         //Enleve la clé "null" (= hash des répertoires)
         doublons.remove("null");
@@ -51,6 +60,10 @@ public class CustomTreeNode extends DefaultMutableTreeNode {
         return null;
     }
 
+    /**
+     * Taille totale de l'arborescence de fichiers
+     * @return
+     */
     public long length(){
         long size = 0;
         for (CustomTreeNode child : this.getChilds()) {

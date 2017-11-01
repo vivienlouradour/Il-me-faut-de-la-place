@@ -1,50 +1,29 @@
-package core;
+package Core;
 
-import javax.swing.tree.DefaultTreeModel;
-import java.io.File;
-import java.io.FileFilter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
 import java.security.MessageDigest;
 import java.util.ArrayList;
 
 public class FileNode implements Node {
-    private final String myHash = "MD5";
+    private final String myHash = "MD5"; //Type de hash utilisé
     private File file;
-
-    private byte[] hash;
+    private String hash;
 
     public FileNode(File file){
         this.file = file;
-
-        //Calcul le hash du fichier
-        if(this.file.isFile())
-            this.hash = this.hash();
     }
 
-    private byte[] hash(){
-        try {
-            MessageDigest md = MessageDigest.getInstance(myHash);
-            md.update(Files.readAllBytes(Paths.get(this.absolutePath())));
-            byte[] digest = md.digest();
-            return digest;
-        }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-            return null;
-        }
+    public File getFile(){
+        return this.file;
     }
 
-    @Override
-    public ArrayList<File> doublons() {
-        return null;
+    public boolean isDirectory(){
+        return this.file.isDirectory();
     }
 
-    @Override
-    public DefaultTreeModel modelTree() {
-
-        return null;
-    }
 
     @Override
     public String fileName() {
@@ -53,13 +32,19 @@ public class FileNode implements Node {
     }
 
     @Override
-    public byte[] getHash() {
+    public String getHash() {
         return this.hash;
     }
 
+    /**
+     * Retourne la taille du fichier en octets
+     * @return
+     */
     @Override
     public long length() {
-        return this.file.length();
+
+        return this.file.isDirectory() ? 0 : this.file.length();
+        //return this.file.length();
     }
 
     @Override

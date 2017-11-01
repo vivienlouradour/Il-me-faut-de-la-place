@@ -1,29 +1,37 @@
 package IHM;
 
-import core.CustomTreeNode;
+import Core.CustomTreeNode;
+import Core.FileNode;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Test extends JFrame{
 
     public static void main(String[] args){
-        core.Api api = new core.Api();
+        Core.Api api = new Core.Api();
         JFrame frame = new JFrame("File Browser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        //Construit l'arbre
+        long debut = System.currentTimeMillis();
         CustomTreeNode root = api.getTree("D:\\test");
-        ArrayList<CustomTreeNode> childs =  root.getChilds();
-        Map map = root.doublons();
-        System.out.println(root.getCurrentFileNode().length());
-        System.out.println(root.getCurrentFileNode().absolutePath());
+        System.out.println("Temps de construction : " + (System.currentTimeMillis() - debut));
+        System.out.println("Taille totale : " + root.length());
+
+        //Récupère les doublons
+        debut = System.currentTimeMillis();
+        Map doublons = api.getDoublons(root);
+        System.out.println("Temps de construction : " + (System.currentTimeMillis() - debut));
+        System.out.println("Racine : " + root.getCurrentFileNode().absolutePath());
         System.out.println(root.length());
-        System.out.println("test");
-        for (CustomTreeNode child : childs) {
-            System.out.println(child.getCurrentFileNode().getHash() + " ; file : " + child.getCurrentFileNode().absolutePath());
-        }
+
+
+        //Construction de l'IHM de test
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         JTree tree = new JTree(treeModel);
         tree.setShowsRootHandles(true);
@@ -34,5 +42,6 @@ public class Test extends JFrame{
         frame.setSize(640, 480);
         frame.setVisible(true);
     }
+
 
 }

@@ -1,8 +1,8 @@
-package core;
+package Core;
 
 import java.io.File;
 
-public class CreateTree implements Runnable{
+class CreateTree implements Runnable{
 
     private CustomTreeNode root;
     //private DefaultTreeModel treeModel;  si on préfere retourner un treeModel au lieu de DefaultMutableTreeModel : à voir
