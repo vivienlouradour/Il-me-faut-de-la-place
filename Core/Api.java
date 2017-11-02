@@ -1,108 +1,96 @@
 package Core;
 
+import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-/**
- * Point d'entré.
- * Permet de retourner un arbre représentant l'arborescence des fichiers à partir d'un répertoire
- */
 public class Api {
+    private INode customTree;
+
     /**
-     * Renvoi l'arborescence à partir d'un répertoire racine
-     * @param racine répertoire de départ de l'arborescence
+     * Initialise l'instance à partir de la racine donnée en paramètre
+     * La méthode va créer toute l'arborescence de fichiers, c'est la méthode la plus longue --> à threader
+     * @param racine racine de l'arborescence
+     */
+    public Api(String racine){
+        this.customTree = CustomTreeFactory.create(racine);
+    }
+
+    /**
+     * Retourne un treeModel de l'arborescence inchangée
      * @return
-     * @throws IllegalArgumentException
      */
-    public CustomTreeNode getTree(String racine) throws IllegalArgumentException{
-        //Le thread ne sert à rien pour l'instant
-        File fileRoot = new File(racine);
-        //Si le répertoire indiqué en argument n'existe pas, lance une exception
-        if(!fileRoot.exists())
-            throw new IllegalArgumentException("Le fichier spécifié n'existe pas");
-
-        //Point de départ de l'arbre
-        CustomTreeNode root = new CustomTreeNode(fileRoot);
-
-        //Déclaration du thread chargé de construire l'arbre
-        //En l'état, le thread est inutile. A voir par la suite faire autant de thread que le nombre de cores du CPU
-        //int nbCpuCores = Runtime.getRuntime().availableProcessors();
-        CreateTree createTree =
-                new CreateTree(fileRoot, root);
-        Thread thread = new Thread(createTree);
-        thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return root;
+    public DefaultTreeModel getModelTree(){
+        return ModelTreeFactory.createTreeModel(this.customTree);
     }
-
-    public CustomTreeNode filterTree(CustomTreeNode originalTree, String filterPatern){
-        FileFiltering fileFiltering = new FileFiltering(filterPatern);
-        CustomTreeNode newTree = (CustomTreeNode)originalTree.clone();
-        if(originalTree.getCurrentFile().isFile()) {
-            if(fileFiltering.isValid(originalTree.getCurrentFile()))
-                return newTree;
-            else
-                return null;
-        }
-        else{
-            Enumeration en = newTree.depthFirstEnumeration();
-            while (en.hasMoreElements()) {
-                CustomTreeNode node = (CustomTreeNode)en.nextElement();
-                CustomTreeNode q = this.filterTree(node, filterPatern);
-                if(q != null)
-                    newTree.add(q);
-            }
-        }
-
-
-
-        return newTree;
-    }
-
 
     /**
-     * Retourne une map (clé,valeurs).
-     * La clé correspond au hash du fichier, la valeur correspond à une liste des fichiers identiques (ayant le même hash)
-     * @param tree racine de l'arbre à analyser
-     * @return HashMap des doublons
+     * Retourne un treeModel de l'arborescence filtré
+     * @param filtres liste de filtres à appliquer
+     * @return
      */
-    public HashMap<String, List<File>> getDoublons(CustomTreeNode tree){
-        HashMap<String, List<File>> hashMap = new HashMap();
+    public DefaultTreeModel getModelTree(ArrayList<FileFilter> filtres) {
+        return ModelTreeFactory.createTreeModel(this.customTree, filtres);
+    }
 
-        Enumeration en = tree.depthFirstEnumeration();
-        while (en.hasMoreElements()) {
-            CustomTreeNode node = (CustomTreeNode)en.nextElement();
-            File fileNode = node.getCurrentFile();
-            String hash = hash(fileNode);
-            if(hash == null)
-                continue;
-            if(!hashMap.containsKey(hash)) {
-                ArrayList<File> array = new ArrayList<>();
-                array.add(fileNode);
-                hashMap.put(hash, array);
-            }
-            else
-                hashMap.get(hash).add(fileNode);
+    /**
+     * Retourne un treeModel de l'arborescence filtré
+     * @param filtre filtre à appliquer
+     * @return
+     */
+    public DefaultTreeModel getModelTree(FileFilter filtre){
+        ArrayList<FileFilter> filtres = new ArrayList<>();
+        filtres.add(filtre);
+        return  getModelTree(filtres);
+    }
 
+    public HashMap<String, ArrayList<File>> getDoublons(){
+        HashMap<String, ArrayList<File>> hashMap = new HashMap();
+        String hash = hash(this.customTree);
+        if(hash != null){
+            ArrayList<File> listFile = new ArrayList<>();
+            listFile.add(this.customTree.getFile());
+            hashMap.put(hash, listFile);
         }
+        hashChilds(this.customTree, hashMap);
+
+        //On enlève tous les "non-doublons"
+        hashMap.entrySet().removeIf(e ->  e.getValue().size() <= 1);
         return hashMap;
     }
 
-    private String hash(File file){
-        if(file.isDirectory())
+    //Méthodes privées
+    private void hashChilds(INode node, HashMap<String, ArrayList<File>> hashMap){
+        ArrayList<INode> childNodes = node.getChilds();
+        if(childNodes == null)
+            return;
+        for (INode childNode : childNodes) {
+            String hash = hash(childNode);
+            if(hash != null){
+                if(hashMap.containsKey(hash))
+                    hashMap.get(hash).add(childNode.getFile());
+                else{
+                    ArrayList<File> listFile = new ArrayList<>();
+                    listFile.add(childNode.getFile());
+                    hashMap.put(hash, listFile);
+                }
+            }
+        }
+    }
+
+    private String hash(INode node){
+        if(node instanceof DirectoryNode)
             return null;
         FileInputStream inputStream = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            inputStream = new FileInputStream(file);
+            inputStream = new FileInputStream(node.getFile());
             FileChannel channel = inputStream.getChannel();
             ByteBuffer buff = ByteBuffer.allocate(2048);
             while (channel.read(buff) != -1){
@@ -127,4 +115,5 @@ public class Api {
             }
         }
     }
+
 }
