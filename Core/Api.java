@@ -10,12 +10,14 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * @author Vivien Louradour
+ */
 public class Api {
     private INode customTree;
 
     /**
      * Initialise l'instance à partir de la racine donnée en paramètre
-     * La méthode va créer toute l'arborescence de fichiers, c'est la méthode la plus longue --> à threader
      * @param racine racine de l'arborescence
      */
     public Api(String racine){
