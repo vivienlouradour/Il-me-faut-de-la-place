@@ -27,8 +27,13 @@ public class TestXml {
 
     public static void main(String[] args) {
         //readXml();
-        readTest();
+        //readTest();
         //createXml();
+        String test = "test";
+        String fileAbsolutePath = "test2";
+
+        String expression = "//fichiers/fichier[@absolutePath=" + "\"" + fileAbsolutePath + "\"]";
+        System.out.println("expression = " + expression);
         /*
         File file = new File("D:\\cache.xml");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");

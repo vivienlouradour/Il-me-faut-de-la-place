@@ -1,5 +1,7 @@
 package Core;
 
+import com.sun.media.jfxmediaimpl.MediaDisposer;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -14,9 +16,7 @@ import java.util.Locale;
 /**
  * Cette classe s'occupe de la génération des hash de fichiers et dy système de mise en cache
  */
-class HashManager{
-
-
+class HashManager implements MediaDisposer.Disposable{
     private CacheManager cacheManager;
 
     /**
@@ -67,7 +67,7 @@ class HashManager{
             //return new String(hashValue, Charset.forName("UTF-8"));
         }
         catch (Exception ex){
-            System.out.println(ex.getMessage());
+            ex.printStackTrace(System.out);
             return null;
         }
         finally {
@@ -82,5 +82,8 @@ class HashManager{
     }
 
 
-
+    @Override
+    public void dispose() {
+        this.cacheManager.dispose();
+    }
 }

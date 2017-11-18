@@ -13,14 +13,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Test extends JFrame {
-
+    //private static String path = "D:\\test";
+    private static String path = "C:\\";
     public static void main(String[] args){
         JFrame frame = new JFrame("File Browser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Création de l'arbre perso
         long debut = System.currentTimeMillis();
-        Api api = new Api("D:\\_DocumentsSSD\\_Documents_Perso\\_Informatique\\_DUT Orsay");
+        Api api = new Api(path);
         System.out.println("Temps de construction de l'arbre perso : " + (System.currentTimeMillis() - debut));
         System.out.println("******************************************************");
         String test ="ttest";
@@ -46,8 +47,6 @@ public class Test extends JFrame {
             }
         };
         DefaultTreeModel treeModel = api.getModelTree(filtre);
-        System.out.println(((File)((DefaultMutableTreeNode)treeModel.getRoot()).getUserObject()).getAbsolutePath());
-        System.out.println(((File)((DefaultMutableTreeNode)treeModel.getRoot()).getUserObject()).length());
         System.out.println("Temps de construction du treemodel avec filtres: " + (System.currentTimeMillis() - debut));
         System.out.println("******************************************************");
 

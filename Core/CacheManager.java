@@ -1,5 +1,6 @@
 package Core;
 
+import com.sun.media.jfxmediaimpl.MediaDisposer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -28,7 +29,7 @@ import java.util.Date;
  * Classe qui s'occupe de la gestion du cache
  * Format de cache : XML
  */
-class CacheManager {
+class CacheManager implements MediaDisposer.Disposable{
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     private final String cacheFileName = "cache.xml";
     private File cacheFile;
@@ -38,19 +39,22 @@ class CacheManager {
         String applicationDirectoryPath = ApplicationDirectoryUtilities.getProgramDirectory();
         this.cacheFile = new File(applicationDirectoryPath + File.separator + cacheFileName);
 
-        //Si le fichier de cache n'est pas trouvé, on le créé
-        if(!cacheFile.exists())
+        //Si le fichier de cache est trouvé, on le parse
+        if(cacheFile.exists()){
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                this.xDocument = builder.parse(this.cacheFile);
+            }
+            catch (Exception ex){
+                ex.printStackTrace(System.out);
+            }
+        }
+        //Sinon  on le créé
+        else{
             init();
-
-        //Parsing du fichier XML
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            this.xDocument = builder.parse(this.cacheFile);
         }
-        catch (Exception ex){
 
-        }
     }
 
     /**
@@ -103,7 +107,55 @@ class CacheManager {
             node.getAttributes().getNamedItem("hash").setTextContent(hash);
             node.getAttributes().getNamedItem("lastModification").setTextContent(getLastModifiedFormat(file));
         }
+    }
 
+    /**
+     * Créer et initialise un fichier de cache
+     */
+    private void init() throws ParserConfigurationException, TransformerException{
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+        this.xDocument = docBuilder.newDocument();
+        Element rootElement = this.xDocument.createElement("fichiers");
+        this.xDocument.appendChild(rootElement);
+    }
+
+    /**
+     * Renvoi le noeud du cache corespondant au fichier, null s'il n'est pas présent dans le cache
+     * @param file
+     * @return le Noeud XML du fichier
+     */
+    private Node getFileNode(File file){
+        Element root = this.xDocument.getDocumentElement();
+        XPathFactory xpf = XPathFactory.newInstance();
+        XPath path = xpf.newXPath();
+        String fileAbsolutePath = file.getAbsolutePath();
+        String expression = "//fichiers/fichier[@absolutePath=\"" + fileAbsolutePath + "\"]";
+        Node node;
+        try {
+            node = (Node)path.evaluate(expression, root, XPathConstants.NODE);
+            return node;
+        }
+        catch (XPathExpressionException e){
+            e.printStackTrace(System.out);
+            return null;
+        }
+
+
+    }
+
+
+    /**
+     * Retourne la date de derniere modification d'un fichier sous le format yyyyMMddHHmmss
+     * @return
+     */
+    private String getLastModifiedFormat(File file){
+        return simpleDateFormat.format(file.lastModified());
+    }
+
+    @Override
+    public void dispose() {
         //Enregistrement des changements
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -118,53 +170,5 @@ class CacheManager {
         } catch (TransformerException e) {
             e.printStackTrace(System.out);
         }
-    }
-
-    /**
-     * Créer et initialise un fichier de cache
-     */
-    private void init() throws ParserConfigurationException, TransformerException{
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-        this.xDocument = docBuilder.newDocument();
-        Element rootElement = this.xDocument.createElement("fichiers");
-        this.xDocument.appendChild(rootElement);
-
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource source = new DOMSource(this.xDocument);
-        StreamResult result = new StreamResult(this.cacheFile);
-
-        transformer.transform(source, result);
-    }
-
-    /**
-     * Renvoi le noeud du cache corespondant au fichier, null s'il n'est pas présent dans le cache
-     * @param file
-     * @return le Noeud XML du fichier
-     */
-    private Node getFileNode(File file){
-        Element root = this.xDocument.getDocumentElement();
-        XPathFactory xpf = XPathFactory.newInstance();
-        XPath path = xpf.newXPath();
-        String fileAbsolutePath = file.getAbsolutePath();
-        String expression = "//fichiers/fichier[@absolutePath='" + fileAbsolutePath +"']";
-        Node node;
-        try {
-            return (Node) path.evaluate(expression, root, XPathConstants.NODE);
-        }
-        catch (XPathExpressionException e){
-            return null;
-        }
-
-
-    }
-    /**
-     * Retourne la date de derniere modification d'un fichier sous le format yyyyMMddHHmmss
-     * @return
-     */
-    private String getLastModifiedFormat(File file){
-        return simpleDateFormat.format(file.lastModified());
     }
 }

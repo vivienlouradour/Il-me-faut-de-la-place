@@ -53,8 +53,9 @@ public class Api {
     }
 
     public HashMap<String, ArrayList<File>> getDoublons(){
+        HashManager hashManager = null;
         try {
-            HashManager hashManager = new HashManager();
+            hashManager = new HashManager();
             HashMap<String, ArrayList<File>> hashMap = new HashMap();
             String hash = hash(this.customTree, hashManager);
             if(hash != null){
@@ -71,6 +72,10 @@ public class Api {
         catch (Exception ex){
             ex.printStackTrace(System.out);
             return null;
+        }
+        finally {
+            if(hashManager != null)
+                hashManager.dispose();
         }
     }
 
