@@ -90,6 +90,7 @@ public class Api {
                     hashMap.put(hash, listFile);
                 }
             }
+            hashChilds(childNode ,hashMap, hashManager);
         }
     }
 

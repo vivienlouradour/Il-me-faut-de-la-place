@@ -20,7 +20,7 @@ public class Test extends JFrame {
 
         //Création de l'arbre perso
         long debut = System.currentTimeMillis();
-        Api api = new Api("D:\\test");
+        Api api = new Api("D:\\_DocumentsSSD\\_Documents_Perso\\_Informatique\\_DUT Orsay");
         System.out.println("Temps de construction de l'arbre perso : " + (System.currentTimeMillis() - debut));
         System.out.println("******************************************************");
         String test ="ttest";
@@ -37,13 +37,6 @@ public class Test extends JFrame {
         System.out.println("Temps de récupération (2e fois) des doublons : " + (System.currentTimeMillis() - debut));
         System.out.println("******************************************************");
 
-
-        //Création du DefaultTreeModel
-        debut = System.currentTimeMillis();
-        DefaultTreeModel treeModel = api.getModelTree();
-        System.out.println("Temps de construction du treemodel : " + (System.currentTimeMillis() - debut));
-        System.out.println("******************************************************");
-
         //Création du DefaultTreeModel avec filtre
         debut = System.currentTimeMillis();
         FileFilter filtre = new FileFilter() {
@@ -52,8 +45,16 @@ public class Test extends JFrame {
                 return pathname.getName().endsWith(".mp3");
             }
         };
-        treeModel = api.getModelTree(filtre);
+        DefaultTreeModel treeModel = api.getModelTree(filtre);
+        System.out.println(((File)((DefaultMutableTreeNode)treeModel.getRoot()).getUserObject()).getAbsolutePath());
+        System.out.println(((File)((DefaultMutableTreeNode)treeModel.getRoot()).getUserObject()).length());
         System.out.println("Temps de construction du treemodel avec filtres: " + (System.currentTimeMillis() - debut));
+        System.out.println("******************************************************");
+
+        //Création du DefaultTreeModel
+        debut = System.currentTimeMillis();
+        treeModel = api.getModelTree();
+        System.out.println("Temps de construction du treemodel : " + (System.currentTimeMillis() - debut));
         System.out.println("******************************************************");
 
         //Construction de l'IHM de test
