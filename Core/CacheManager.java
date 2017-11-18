@@ -7,6 +7,7 @@ import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -28,14 +29,14 @@ import java.util.Date;
  * Format de cache : XML
  */
 class CacheManager {
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     private final String cacheFileName = "cache.xml";
     private File cacheFile;
     private Document xDocument;
 
-    protected CacheManager() throws IOException {
+    protected CacheManager() throws IOException, ParserConfigurationException, TransformerException {
         String applicationDirectoryPath = ApplicationDirectoryUtilities.getProgramDirectory();
-        this.cacheFile = new File(applicationDirectoryPath + File.pathSeparator + cacheFileName);
+        this.cacheFile = new File(applicationDirectoryPath + File.separator + cacheFileName);
 
         //Si le fichier de cache n'est pas trouvé, on le créé
         if(!cacheFile.exists())
@@ -67,7 +68,8 @@ class CacheManager {
 
             NamedNodeMap attributes = node.getAttributes();
             Date lastModificationInCache = simpleDateFormat.parse(attributes.getNamedItem("lastModification").getTextContent());
-            if(!lastModificationInCache.equals(new Date(file.lastModified())))
+            Date lastModificationFile = new Date(file.lastModified());
+            if(!lastModificationInCache.equals(lastModificationFile))
                 return null;
             return node.getAttributes().getNamedItem("hash").getTextContent();
         }
@@ -112,17 +114,29 @@ class CacheManager {
             transformer.transform(source, result);
         }
         catch (TransformerConfigurationException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         } catch (TransformerException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
     }
 
     /**
      * Créer et initialise un fichier de cache
      */
-    private void init(){
-        //TODO
+    private void init() throws ParserConfigurationException, TransformerException{
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+        this.xDocument = docBuilder.newDocument();
+        Element rootElement = this.xDocument.createElement("fichiers");
+        this.xDocument.appendChild(rootElement);
+
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource source = new DOMSource(this.xDocument);
+        StreamResult result = new StreamResult(this.cacheFile);
+
+        transformer.transform(source, result);
     }
 
     /**

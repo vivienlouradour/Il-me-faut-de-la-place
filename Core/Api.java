@@ -15,7 +15,6 @@ import java.util.HashMap;
  */
 public class Api {
     private INode customTree;
-    //private static HashManager hashManager = new HashManager();
 
     /**
      * Initialise l'instance à partir de la racine donnée en paramètre
@@ -54,27 +53,34 @@ public class Api {
     }
 
     public HashMap<String, ArrayList<File>> getDoublons(){
-        HashMap<String, ArrayList<File>> hashMap = new HashMap();
-        String hash = hash(this.customTree);
-        if(hash != null){
-            ArrayList<File> listFile = new ArrayList<>();
-            listFile.add(this.customTree.getFile());
-            hashMap.put(hash, listFile);
-        }
-        hashChilds(this.customTree, hashMap);
+        try {
+            HashManager hashManager = new HashManager();
+            HashMap<String, ArrayList<File>> hashMap = new HashMap();
+            String hash = hash(this.customTree, hashManager);
+            if(hash != null){
+                ArrayList<File> listFile = new ArrayList<>();
+                listFile.add(this.customTree.getFile());
+                hashMap.put(hash, listFile);
+            }
+            hashChilds(this.customTree, hashMap, hashManager);
 
-        //On enlève tous les "non-doublons"
-        hashMap.entrySet().removeIf(e ->  e.getValue().size() <= 1);
-        return hashMap;
+            //On enlève tous les "non-doublons"
+            hashMap.entrySet().removeIf(e ->  e.getValue().size() <= 1);
+            return hashMap;
+        }
+        catch (Exception ex){
+            ex.printStackTrace(System.out);
+            return null;
+        }
     }
 
     //Méthodes privées
-    private void hashChilds(INode node, HashMap<String, ArrayList<File>> hashMap){
+    private void hashChilds(INode node, HashMap<String, ArrayList<File>> hashMap, HashManager hashManager){
         ArrayList<INode> childNodes = node.getChilds();
         if(childNodes == null)
             return;
         for (INode childNode : childNodes) {
-            String hash = hash(childNode);
+            String hash = hash(childNode, hashManager);
             if(hash != null){
                 if(hashMap.containsKey(hash))
                     hashMap.get(hash).add(childNode.getFile());
@@ -87,9 +93,9 @@ public class Api {
         }
     }
 
-    private String hash(INode node){
+    private String hash(INode node, HashManager hashManager){
         if(node instanceof DirectoryNode)
             return null;
-        return null;//hashManager.getHash(node.getFile());
+        return hashManager.getHash(node.getFile());
     }
 }

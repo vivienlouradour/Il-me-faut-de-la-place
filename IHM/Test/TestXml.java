@@ -26,13 +26,85 @@ import org.xml.sax.SAXException;
 public class TestXml {
 
     public static void main(String[] args) {
-        readXml();
+        //readXml();
+        readTest();
+        //createXml();
         /*
         File file = new File("D:\\cache.xml");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         sdf.format(file.lastModified());
         System.out.println("file.lastModified() = " +);
         */
+    }
+
+    private static void createXml(){
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Document doc = docBuilder.newDocument();
+            Element rootElement = doc.createElement("fichiers");
+            doc.appendChild(rootElement);
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("D:\\cache2.xml"));
+            transformer.transform(source, result);
+
+
+        }
+        catch (Exception e){
+            e.printStackTrace(System.out);
+        }
+    }
+
+    private static void readTest(){
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+        try {
+            // Création de notre parseur via la factory
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            String filepath = "D:\\cacheencoding.xml";
+            File fileXML = new File(filepath);
+
+            Document xml = builder.parse(fileXML);
+
+            // Via notre objet Document, nous pouvons récupérer un objet Element
+            // Ce dernier représente un élément XML mais, avec la méthode ci-dessous,
+            // cet élément sera la racine du document
+            Element root = xml.getDocumentElement();
+            System.out.println(root.getNodeName());
+            NodeList nodes =  root.getChildNodes();
+
+
+            XPathFactory xpf = XPathFactory.newInstance();
+            XPath path = xpf.newXPath();
+
+            String expression = "//fichiers/fichier[@absolutePath='aaa']";
+            Node node = (Node)path.evaluate(expression, root, XPathConstants.NODE);
+            System.out.println("str = " + node.getAttributes().getNamedItem("lastModification").getTextContent());
+
+            Node nodeAttr = node.getAttributes().getNamedItem("lastModification");
+            nodeAttr.setTextContent("<>");
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(xml);
+
+            StreamResult result = new StreamResult(new File(filepath));
+            transformer.transform(source, result);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace(System.out);
+        } catch (SAXException e) {
+            e.printStackTrace(System.out);
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }catch (XPathExpressionException e){
+            e.printStackTrace(System.out);
+        }catch (TransformerException e){
+            e.printStackTrace(System.out);
+        }
     }
 
     private static void readXml(){
@@ -43,7 +115,7 @@ public class TestXml {
         try {
             // Création de notre parseur via la factory
             DocumentBuilder builder = factory.newDocumentBuilder();
-            String filepath = "D:\\cache.xml";
+            String filepath = "D:\\cache2.xml";
             File fileXML = new File(filepath);
 
             // parsing de notre fichier via un objet File et récupération d'un
@@ -63,18 +135,18 @@ public class TestXml {
             XPath path = xpf.newXPath();
 
             String expression = "//fichiers/fichier[@absolutePath='aaa']";
-            Node node = (Node)path.evaluate(expression, root, XPathConstants.NODE);
+            //Node node = (Node)path.evaluate(expression, root, XPathConstants.NODE);
 
             //Update
-            Node nodeAttr = node.getAttributes().getNamedItem("lastModification");
-            nodeAttr.setTextContent("corrompu");
+            //Node nodeAttr = node.getAttributes().getNamedItem("lastModification");
+            //nodeAttr.setTextContent("corrompu");
 
             //Ajout
             Element age = xml.createElement("fichier");
             age.setAttribute("test", "testvalue");
             root.appendChild(age);
 
-            System.out.println("str = " + node.getAttributes().getNamedItem("lastModification").getTextContent());
+            //System.out.println("str = " + node.getAttributes().getNamedItem("lastModification").getTextContent());
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
@@ -84,20 +156,18 @@ public class TestXml {
             transformer.transform(source, result);
 
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         } catch (SAXException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
-        catch (XPathExpressionException e){
-            e.printStackTrace();
-        }
+
         catch (TransformerConfigurationException e){
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
         catch (TransformerException e){
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
     }
 }

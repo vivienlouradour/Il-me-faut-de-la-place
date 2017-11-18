@@ -22,17 +22,27 @@ public class Test extends JFrame {
         long debut = System.currentTimeMillis();
         Api api = new Api("D:\\test");
         System.out.println("Temps de construction de l'arbre perso : " + (System.currentTimeMillis() - debut));
+        System.out.println("******************************************************");
         String test ="ttest";
 
         //Récupération des doublons
         debut = System.currentTimeMillis();
         HashMap<String, ArrayList<File>> doublons = api.getDoublons();
         System.out.println("Temps de récupération des doublons : " + (System.currentTimeMillis() - debut));
+        System.out.println("******************************************************");
+
+        //Deuxieme récupération des doublons (pour tester l'efficacité du cache)
+        debut = System.currentTimeMillis();
+        doublons = api.getDoublons();
+        System.out.println("Temps de récupération (2e fois) des doublons : " + (System.currentTimeMillis() - debut));
+        System.out.println("******************************************************");
+
 
         //Création du DefaultTreeModel
         debut = System.currentTimeMillis();
         DefaultTreeModel treeModel = api.getModelTree();
         System.out.println("Temps de construction du treemodel : " + (System.currentTimeMillis() - debut));
+        System.out.println("******************************************************");
 
         //Création du DefaultTreeModel avec filtre
         debut = System.currentTimeMillis();
@@ -44,6 +54,7 @@ public class Test extends JFrame {
         };
         treeModel = api.getModelTree(filtre);
         System.out.println("Temps de construction du treemodel avec filtres: " + (System.currentTimeMillis() - debut));
+        System.out.println("******************************************************");
 
         //Construction de l'IHM de test
         JTree tree = new JTree(treeModel);

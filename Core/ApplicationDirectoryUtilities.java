@@ -40,7 +40,7 @@ class ApplicationDirectoryUtilities
             return new File(ApplicationDirectoryUtilities.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
         } catch (URISyntaxException exception)
         {
-            exception.printStackTrace();
+            exception.printStackTrace(System.out);
         }
         return null;
     }

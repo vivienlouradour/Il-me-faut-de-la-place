@@ -1,14 +1,15 @@
 package Core;
 
-import com.sun.media.jfxmediaimpl.MediaDisposer;
-import sun.misc.Cache;
-
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
+import java.util.Locale;
 
 /**
  * Cette classe s'occupe de la génération des hash de fichiers et dy système de mise en cache
@@ -21,7 +22,7 @@ class HashManager{
     /**
      * Constructeur vide
      */
-    protected HashManager() throws IOException{
+    protected HashManager() throws IOException, ParserConfigurationException, TransformerException {
         this.cacheManager = new CacheManager();
     }
 
@@ -62,7 +63,8 @@ class HashManager{
                 buff.clear();
             }
             byte[] hashValue = md.digest();
-            return new String(hashValue);
+            return String.format(Locale.ROOT, "%032x", new BigInteger(1, hashValue));
+            //return new String(hashValue, Charset.forName("UTF-8"));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -74,7 +76,7 @@ class HashManager{
                     inputStream.close();
             }
             catch (Exception ex){
-                ex.printStackTrace();
+                ex.printStackTrace(System.out);
             }
         }
     }
