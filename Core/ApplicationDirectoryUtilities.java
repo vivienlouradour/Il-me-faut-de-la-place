@@ -3,9 +3,9 @@ package Core;
 import java.io.File;
 import java.net.URISyntaxException;
 
-public class ApplicationDirectoryUtilities
+class ApplicationDirectoryUtilities
 {
-    public static String getProgramDirectory()
+    protected static String getProgramDirectory()
     {
         if (runningFromJAR())
             return getCurrentJARDirectory();

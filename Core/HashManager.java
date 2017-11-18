@@ -1,29 +1,30 @@
 package Core;
 
+import com.sun.media.jfxmediaimpl.MediaDisposer;
+import sun.misc.Cache;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.security.MessageDigest;
 
 /**
- * Cette classe s'occupe de la génération des hash de fichiers et de leurs mis en cache
+ * Cette classe s'occupe de la génération des hash de fichiers et dy système de mise en cache
  */
-public class HashManager {
-    /**
-     * Nom du fichier de cache
-     */
-    private final String hashHistoryFileName = "";
-    private final String applicationDirectoryPath = ApplicationDirectoryUtilities.getProgramDirectory();
-    private File hashHistoryFile;
+class HashManager{
+
+
+    private CacheManager cacheManager;
 
     /**
      * Constructeur vide
      */
-    public HashManager(){
-        this.hashHistoryFile = new File(applicationDirectoryPath + File.separator + hashHistoryFileName);
-
-        //Si le fichier de cache n'est pas trouvé, on le créé
-        if(!this.hashHistoryFile.exists()){
-            initCache();
-        }
+    protected HashManager() throws IOException{
+        this.cacheManager = new CacheManager();
     }
+
 
     /**
      * Retourne le hash du fichier passé en paramètre
@@ -31,37 +32,16 @@ public class HashManager {
      * @param file fichier à hasher
      * @return le Hash MD5 du fichier "file"
      */
-    public String getHash(File file){
+    protected String getHash(File file){
         //Récupère le hash du fichier dans le cache s'il existe
-        String hash = getCacheHash(file);
+        String hash = this.cacheManager.getHash(file);
 
         //Si le hash du fichier n'existe pas dans le cash, on le calcule et on update le cache
         if(hash == null){
             hash = hashFile(file);
-            setCacheHash(file, hash);
+            this.cacheManager.setHash(file, hash);
         }
         return hash;
-    }
-
-
-    /**
-     * Ajoute ou met à jour le hash d'un fichier dans le cache
-     * @param file
-     * @param hash
-     */
-    private void setCacheHash(File file, String hash){
-        //si le hash est déjà dans le cache : update
-        //sinon : insert
-    }
-
-    /**
-     * Recherche dans le cache le hash à jour d'un fichier
-     * @param file fichier à rechercher
-     * @return Hash MD5 du fichier, null si le fichier n'est pas trouvé dans le cache ou qu'il a été modifié depuis la derniere mise en cache
-     */
-    private String getCacheHash(File file){
-        //Retourne le hash du fichier s'il est présent dans le cache et que dateModif OK
-        return null;
     }
 
     /**
@@ -70,16 +50,35 @@ public class HashManager {
      * @return hash MD5 du fichier
      */
     private String hashFile(File file){
-        //TODO
-        return null;
+        FileInputStream inputStream = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            inputStream = new FileInputStream(file);
+            FileChannel channel = inputStream.getChannel();
+            ByteBuffer buff = ByteBuffer.allocate(2048);
+            while (channel.read(buff) != -1){
+                buff.flip();
+                md.update(buff);
+                buff.clear();
+            }
+            byte[] hashValue = md.digest();
+            return new String(hashValue);
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+            return null;
+        }
+        finally {
+            try {
+                if (inputStream != null)
+                    inputStream.close();
+            }
+            catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
     }
 
-    /**
-     * Créer et initialise un fichier de cache
-     */
-    private void initCache(){
-
-    }
 
 
 }

@@ -3,7 +3,7 @@ package Core;
 import java.io.File;
 import java.util.ArrayList;
 
-public class DirectoryNode implements INode {
+class DirectoryNode implements INode {
     private File file;
     private DirectoryNode parent;
     private ArrayList<INode> childs;

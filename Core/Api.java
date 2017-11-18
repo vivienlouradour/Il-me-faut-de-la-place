@@ -15,6 +15,7 @@ import java.util.HashMap;
  */
 public class Api {
     private INode customTree;
+    //private static HashManager hashManager = new HashManager();
 
     /**
      * Initialise l'instance à partir de la racine donnée en paramètre
@@ -29,7 +30,7 @@ public class Api {
      * @return
      */
     public DefaultTreeModel getModelTree(){
-        return ModelTreeFactory.createTreeModel(this.customTree);
+        return ModelTreeFactory.createTreeModelWithFilters(this.customTree);
     }
 
     /**
@@ -38,7 +39,7 @@ public class Api {
      * @return
      */
     public DefaultTreeModel getModelTree(ArrayList<FileFilter> filtres) {
-        return ModelTreeFactory.createTreeModel(this.customTree, filtres);
+        return ModelTreeFactory.createTreeModelWithFilters(this.customTree, filtres);
     }
 
     /**
@@ -89,32 +90,6 @@ public class Api {
     private String hash(INode node){
         if(node instanceof DirectoryNode)
             return null;
-        FileInputStream inputStream = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            inputStream = new FileInputStream(node.getFile());
-            FileChannel channel = inputStream.getChannel();
-            ByteBuffer buff = ByteBuffer.allocate(2048);
-            while (channel.read(buff) != -1){
-                buff.flip();
-                md.update(buff);
-                buff.clear();
-            }
-            byte[] hashValue = md.digest();
-            return new String(hashValue);
-        }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-            return null;
-        }
-        finally {
-            try {
-                if (inputStream != null)
-                    inputStream.close();
-            }
-            catch (Exception ex){
-                ex.printStackTrace();
-            }
-        }
+        return null;//hashManager.getHash(node.getFile());
     }
 }

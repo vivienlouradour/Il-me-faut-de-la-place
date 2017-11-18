@@ -5,9 +5,9 @@ import javax.swing.tree.DefaultTreeModel;
 import java.io.FileFilter;
 import java.util.ArrayList;
 
-public class ModelTreeFactory {
+class ModelTreeFactory {
 
-    protected static DefaultTreeModel createTreeModel(INode rootNode){
+    protected static DefaultTreeModel createTreeModelWithFilters(INode rootNode){
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootNode.getFile());
 
         createModelTreeChild(rootNode, root);
@@ -15,7 +15,7 @@ public class ModelTreeFactory {
         return new DefaultTreeModel(root);
     }
 
-    protected static DefaultTreeModel createTreeModel(INode rootNode, ArrayList<FileFilter> filtres){
+    protected static DefaultTreeModel createTreeModelWithFilters(INode rootNode, ArrayList<FileFilter> filtres){
         DefaultMutableTreeNode root = null;
 
         if(acceptNode(rootNode, filtres)){
@@ -70,4 +70,5 @@ public class ModelTreeFactory {
         }
         return accept;
     }
+
 }
