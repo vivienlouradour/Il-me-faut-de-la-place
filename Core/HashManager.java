@@ -6,6 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -17,13 +18,13 @@ import java.util.Locale;
  * Cette classe s'occupe de la génération des hash de fichiers et dy système de mise en cache
  */
 class HashManager implements MediaDisposer.Disposable{
-    private CacheManager cacheManager;
+    private CacheManagerV3 cacheManager;
 
     /**
      * Constructeur vide
      */
     protected HashManager() throws IOException, ParserConfigurationException, TransformerException {
-        this.cacheManager = new CacheManager();
+        this.cacheManager = new CacheManagerV3();
     }
 
 
@@ -35,13 +36,8 @@ class HashManager implements MediaDisposer.Disposable{
      */
     protected String getHash(File file){
         //Récupère le hash du fichier dans le cache s'il existe
-        String hash = this.cacheManager.getHash(file);
+        String hash = this.cacheManager.getHashAndUpdateCache(file);
 
-        //Si le hash du fichier n'existe pas dans le cash, on le calcule et on update le cache
-        if(hash == null){
-            hash = hashFile(file);
-            this.cacheManager.setHash(file, hash);
-        }
         return hash;
     }
 
@@ -50,7 +46,7 @@ class HashManager implements MediaDisposer.Disposable{
      * @param file fichier à hasher
      * @return hash MD5 du fichier
      */
-    private String hashFile(File file){
+    protected static String hashFile(File file){
         FileInputStream inputStream = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -65,6 +61,10 @@ class HashManager implements MediaDisposer.Disposable{
             byte[] hashValue = md.digest();
             return String.format(Locale.ROOT, "%032x", new BigInteger(1, hashValue));
             //return new String(hashValue, Charset.forName("UTF-8"));
+        }
+        catch (FileNotFoundException e){
+            System.out.println("Hash impossible : Le fichier \"" + file.getAbsolutePath() + "\" est en cours d'utilisation. Le fichier est ignoré pour la recherche de doublon");
+            return null;
         }
         catch (Exception ex){
             ex.printStackTrace(System.out);

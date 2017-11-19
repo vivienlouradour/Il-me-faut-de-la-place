@@ -29,13 +29,13 @@ import java.util.Date;
  * Classe qui s'occupe de la gestion du cache
  * Format de cache : XML
  */
-class CacheManager implements MediaDisposer.Disposable{
+class CacheManagerV2 implements MediaDisposer.Disposable{
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-    private final String cacheFileName = "cache.xml";
+    private final String cacheFileName = "cache_v2.xml";
     private File cacheFile;
     private Document xDocument;
 
-    protected CacheManager() throws IOException, ParserConfigurationException, TransformerException {
+    protected CacheManagerV2() throws IOException, ParserConfigurationException, TransformerException {
         String applicationDirectoryPath = ApplicationDirectoryUtilities.getProgramDirectory();
         this.cacheFile = new File(applicationDirectoryPath + File.separator + cacheFileName);
 

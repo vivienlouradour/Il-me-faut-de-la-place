@@ -29,7 +29,7 @@ public class Api {
      * @return
      */
     public DefaultTreeModel getModelTree(){
-        return ModelTreeFactory.createTreeModelWithFilters(this.customTree);
+        return ModelTreeFactory.createTreeModel(this.customTree);
     }
 
     /**

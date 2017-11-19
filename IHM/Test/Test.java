@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 public class Test extends JFrame {
     //private static String path = "D:\\test";
-    private static String path = "C:\\";
+    private static String path = "D:\\_DocumentsSSD";
     public static void main(String[] args){
         JFrame frame = new JFrame("File Browser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

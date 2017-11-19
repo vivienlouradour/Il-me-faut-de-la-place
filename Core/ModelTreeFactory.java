@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 class ModelTreeFactory {
 
-    protected static DefaultTreeModel createTreeModelWithFilters(INode rootNode){
+    protected static DefaultTreeModel createTreeModel(INode rootNode){
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootNode.getFile());
 
         createModelTreeChild(rootNode, root);
