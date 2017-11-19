@@ -19,11 +19,13 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Classe qui s'occupe de la gestion du cache
@@ -31,9 +33,10 @@ import java.util.Date;
  */
 class CacheManagerV2 implements MediaDisposer.Disposable{
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-    private final String cacheFileName = "cache_v2.xml";
+    private final String cacheFileName = "cache_v3.ser";
     private File cacheFile;
     private Document xDocument;
+    private ArrayList<SerializedFile> serializedFiles;
 
     protected CacheManagerV2() throws IOException, ParserConfigurationException, TransformerException {
         String applicationDirectoryPath = ApplicationDirectoryUtilities.getProgramDirectory();
@@ -42,9 +45,9 @@ class CacheManagerV2 implements MediaDisposer.Disposable{
         //Si le fichier de cache est trouvé, on le parse
         if(cacheFile.exists()){
             try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                this.xDocument = builder.parse(this.cacheFile);
+                FileInputStream in = new FileInputStream(this.cacheFile);
+                ObjectInputStream oos = new ObjectInputStream(in);
+                this.serializedFiles = (ArrayList<SerializedFile>)oos.readObject();
             }
             catch (Exception ex){
                 ex.printStackTrace(System.out);
@@ -52,7 +55,7 @@ class CacheManagerV2 implements MediaDisposer.Disposable{
         }
         //Sinon  on le créé
         else{
-            init();
+            this.serializedFiles = new ArrayList<>();
         }
 
     }
@@ -63,85 +66,30 @@ class CacheManagerV2 implements MediaDisposer.Disposable{
      * @return Hash MD5 du fichier, null si le fichier n'est pas trouvé dans le cache ou qu'il a été modifié depuis la derniere mise en cache
      */
     protected String getHashAndUpdateCache(File file){
-        Node node;
+        String hash;
+        String absolutePathToSearch = file.getAbsolutePath();
+        Date fileDate = new Date(file.lastModified());
         try {
-            node = getFileNode(file);
-
-            String hash;
-            if(node != null){
-                NamedNodeMap attributes = node.getAttributes();
-                Date lastModificationInCache = simpleDateFormat.parse(attributes.getNamedItem("lastModification").getTextContent());
-                Date lastModificationFile = new Date(file.lastModified());
-                if(!lastModificationInCache.equals(lastModificationFile))
-                    hash = updateHash(file, node);
-                else
-                    hash = node.getAttributes().getNamedItem("hash").getTextContent();
+            SerializedFile fileFound = this.serializedFiles.stream()
+                    .filter(listFile -> listFile.absolutePath.equals(absolutePathToSearch))
+                    .findFirst()
+                    .get();
+            if(fileFound.lastModification.equals(fileDate))
+                hash = fileFound.hash;
+            else {
+                hash = HashManager.hashFile(file);
+                fileFound.hash = hash;
             }
-            else{
-                hash = insertHash(file);
-            }
-            return hash;
         }
-        catch (ParseException e){
-            return null;
+        catch (NoSuchElementException e){
+            hash = HashManager.hashFile(file);
+            if(hash != null)
+                this.serializedFiles.add(new SerializedFile(absolutePathToSearch, hash, new Date(file.lastModified())));
         }
-    }
-
-    private String insertHash(File file){
-        String newHash = HashManager.hashFile(file);
-        Element newFileNode = xDocument.createElement("fichier");
-        newFileNode.setAttribute("absolutePath", file.getAbsolutePath());
-        newFileNode.setAttribute("hash", newHash);
-        newFileNode.setAttribute("lastModification", getLastModifiedFormat(file));
-        xDocument.getDocumentElement().appendChild(newFileNode);
-
-        return newHash;
-    }
-
-    private String updateHash(File file, Node nodeToUpdate){
-        String newHash = HashManager.hashFile(file);
-        nodeToUpdate.getAttributes().getNamedItem("hash").setTextContent(newHash);
-        nodeToUpdate.getAttributes().getNamedItem("lastModification").setTextContent(getLastModifiedFormat(file));
-        return newHash;
+        return hash;
     }
 
 
-
-    /**
-     * Créer et initialise un fichier de cache
-     */
-    private void init() throws ParserConfigurationException, TransformerException{
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-        this.xDocument = docBuilder.newDocument();
-        Element rootElement = this.xDocument.createElement("fichiers");
-        this.xDocument.appendChild(rootElement);
-    }
-
-    /**
-     * Renvoi le noeud du cache corespondant au fichier, null s'il n'est pas présent dans le cache
-     * @param file
-     * @return le Noeud XML du fichier
-     */
-    private Node getFileNode(File file){
-        Element root = this.xDocument.getDocumentElement();
-        XPathFactory xpf = XPathFactory.newInstance();
-        XPath path = xpf.newXPath();
-        String fileAbsolutePath = file.getAbsolutePath();
-        String expression = "//fichiers/fichier[@absolutePath=\"" + fileAbsolutePath + "\"]";
-        Node node;
-        try {
-            node = (Node)path.evaluate(expression, root, XPathConstants.NODE);
-            return node;
-        }
-        catch (XPathExpressionException e){
-            e.printStackTrace(System.out);
-            return null;
-        }
-
-
-    }
 
 
     /**
@@ -156,17 +104,25 @@ class CacheManagerV2 implements MediaDisposer.Disposable{
     public void dispose() {
         //Enregistrement des changements
         try {
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(xDocument);
+            FileOutputStream out = new FileOutputStream(this.cacheFile);
+            ObjectOutputStream oos = new ObjectOutputStream(out);
+            oos.writeObject(this.serializedFiles);
+            oos.flush();
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+    }
 
-            StreamResult result = new StreamResult(this.cacheFile);
-            transformer.transform(source, result);
-        }
-        catch (TransformerConfigurationException e) {
-            e.printStackTrace(System.out);
-        } catch (TransformerException e) {
-            e.printStackTrace(System.out);
-        }
+
+}
+class SerializedFile implements Serializable{
+    public String absolutePath;
+    public String hash;
+    public Date lastModification;
+
+    SerializedFile(String absolutePath, String hash, Date lastModification){
+        this.absolutePath = absolutePath;
+        this.hash = hash;
+        this.lastModification = lastModification;
     }
 }

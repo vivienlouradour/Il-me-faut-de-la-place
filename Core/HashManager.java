@@ -18,13 +18,13 @@ import java.util.Locale;
  * Cette classe s'occupe de la génération des hash de fichiers et dy système de mise en cache
  */
 class HashManager implements MediaDisposer.Disposable{
-    private CacheManagerV3 cacheManager;
+    private CacheManagerV2 cacheManager;
 
     /**
      * Constructeur vide
      */
     protected HashManager() throws IOException, ParserConfigurationException, TransformerException {
-        this.cacheManager = new CacheManagerV3();
+        this.cacheManager = new CacheManagerV2();
     }
 
 
