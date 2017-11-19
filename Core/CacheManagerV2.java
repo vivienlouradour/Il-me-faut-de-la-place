@@ -50,7 +50,7 @@ class CacheManagerV2 implements MediaDisposer.Disposable{
                 this.serializedFiles = (ArrayList<SerializedFile>)oos.readObject();
             }
             catch (Exception ex){
-                ex.printStackTrace(System.out);
+                ex.printStackTrace(System.err);
             }
         }
         //Sinon  on le créé
@@ -109,7 +109,7 @@ class CacheManagerV2 implements MediaDisposer.Disposable{
             oos.writeObject(this.serializedFiles);
             oos.flush();
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }
     }
 

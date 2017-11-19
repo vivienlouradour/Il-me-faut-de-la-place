@@ -1,6 +1,8 @@
 package IHM.Test;
 
 import Core.Api;
+import Core.DirectoryNode;
+import Core.Node;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -13,8 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Test extends JFrame {
-    //private static String path = "D:\\test";
-    private static String path = "D:\\_DocumentsSSD";
+    private static String path = "D:\\test";
+    //private static String path = "D:\\_DocumentsSSD";
     public static void main(String[] args){
         JFrame frame = new JFrame("File Browser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -78,7 +80,7 @@ public class Test extends JFrame {
             // decide what icons you want by examining the node
             if (value instanceof DefaultMutableTreeNode) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-                if(((File)node.getUserObject()).isDirectory()){
+                if(node.getUserObject() instanceof DirectoryNode){
                     setIcon(UIManager.getIcon("FileView.directoryIcon"));
                 }
                 else{

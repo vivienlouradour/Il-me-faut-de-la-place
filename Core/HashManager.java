@@ -67,7 +67,7 @@ class HashManager implements MediaDisposer.Disposable{
             return null;
         }
         catch (Exception ex){
-            ex.printStackTrace(System.out);
+            ex.printStackTrace(System.err);
             return null;
         }
         finally {
@@ -76,7 +76,7 @@ class HashManager implements MediaDisposer.Disposable{
                     inputStream.close();
             }
             catch (Exception ex){
-                ex.printStackTrace(System.out);
+                ex.printStackTrace(System.err);
             }
         }
     }

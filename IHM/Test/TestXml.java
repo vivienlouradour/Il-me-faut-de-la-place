@@ -60,7 +60,7 @@ public class TestXml {
 
         }
         catch (Exception e){
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }
     }
 
@@ -100,15 +100,15 @@ public class TestXml {
             StreamResult result = new StreamResult(new File(filepath));
             transformer.transform(source, result);
         } catch (ParserConfigurationException e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         } catch (SAXException e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         } catch (IOException e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }catch (XPathExpressionException e){
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }catch (TransformerException e){
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }
     }
 
@@ -161,18 +161,17 @@ public class TestXml {
             transformer.transform(source, result);
 
         } catch (ParserConfigurationException e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         } catch (SAXException e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         } catch (IOException e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }
-
         catch (TransformerConfigurationException e){
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }
         catch (TransformerException e){
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }
     }
 }

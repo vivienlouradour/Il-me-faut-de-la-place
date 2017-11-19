@@ -3,31 +3,21 @@ package Core;
 import java.io.File;
 import java.util.ArrayList;
 
-class DirectoryNode implements INode {
-    private File file;
-    private DirectoryNode parent;
-    private ArrayList<INode> childs;
+public class DirectoryNode extends Node {
+    private ArrayList<Node> childs;
 
-    public DirectoryNode(File file){
-        this.file = file;
+    protected DirectoryNode(File file){
+        super(file);
         childs = new ArrayList<>();
     }
 
-    @Override
-    public File getFile(){
-        return this.file;
-    }
 
     @Override
-    public ArrayList<INode> getChilds() {
+    protected ArrayList<Node> getChilds() {
         return this.childs;
     }
 
-    public void setParent(DirectoryNode parentNode){
-        this.parent = parentNode;
-    }
-
-    public void addChild(INode node){
+    protected void addChild(Node node){
         node.setParent(this);
         this.childs.add(node);
     }

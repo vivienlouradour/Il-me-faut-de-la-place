@@ -3,9 +3,8 @@ package Core;
 import java.io.File;
 
 class CustomTreeFactory {
-
-    protected static INode create(String racine){
-        INode rootNode;
+    protected static Node create(String racine){
+        Node rootNode;
         File fileRoot = new File(racine);
         //Si le répertoire indiqué en argument n'existe pas, lance une exception
         if(!fileRoot.exists())
@@ -26,23 +25,24 @@ class CustomTreeFactory {
      * @param file
      * @param node
      */
-    private static void createChilds(File file, INode node){
+    private static void createChilds(File file, Node node){
         File[] files = file.listFiles();
         if(files == null)
             return;
         for (File subFile: files) {
-            INode subNode = createNode(subFile);
-            ((DirectoryNode)node).addChild(subNode);
+            Node subNode = createNode(subFile);
+            subNode.setTotalLength(subFile.length());
             createChilds(subFile, subNode);
+            node.setTotalLength(node.getTotalLength() + subNode.getTotalLength());
+            ((DirectoryNode)node).addChild(subNode);
         }
 
     }
 
-    private static INode createNode(File file){
+    private static Node createNode(File file){
         if(file.isFile())
             return new FileNode(file);
         else
             return new DirectoryNode(file);
     }
-
 }

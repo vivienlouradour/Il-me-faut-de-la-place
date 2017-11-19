@@ -47,7 +47,7 @@ class CacheManager implements MediaDisposer.Disposable{
                 this.xDocument = builder.parse(this.cacheFile);
             }
             catch (Exception ex){
-                ex.printStackTrace(System.out);
+                ex.printStackTrace(System.err);
             }
         }
         //Sinon  on le créé
@@ -136,7 +136,7 @@ class CacheManager implements MediaDisposer.Disposable{
             return node;
         }
         catch (XPathExpressionException e){
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
             return null;
         }
 
@@ -164,9 +164,9 @@ class CacheManager implements MediaDisposer.Disposable{
             transformer.transform(source, result);
         }
         catch (TransformerConfigurationException e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         } catch (TransformerException e) {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
         }
     }
 }

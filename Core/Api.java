@@ -3,10 +3,6 @@ package Core;
 import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,7 +10,7 @@ import java.util.HashMap;
  * @author Vivien Louradour
  */
 public class Api {
-    private INode customTree;
+    private Node customTree;
 
     /**
      * Initialise l'instance à partir de la racine donnée en paramètre
@@ -70,7 +66,7 @@ public class Api {
             return hashMap;
         }
         catch (Exception ex){
-            ex.printStackTrace(System.out);
+            ex.printStackTrace(System.err);
             return null;
         }
         finally {
@@ -80,11 +76,11 @@ public class Api {
     }
 
     //Méthodes privées
-    private void hashChilds(INode node, HashMap<String, ArrayList<File>> hashMap, HashManager hashManager){
-        ArrayList<INode> childNodes = node.getChilds();
+    private void hashChilds(Node node, HashMap<String, ArrayList<File>> hashMap, HashManager hashManager){
+        ArrayList<Node> childNodes = node.getChilds();
         if(childNodes == null)
             return;
-        for (INode childNode : childNodes) {
+        for (Node childNode : childNodes) {
             String hash = hash(childNode, hashManager);
             if(hash != null){
                 if(hashMap.containsKey(hash))
@@ -99,7 +95,7 @@ public class Api {
         }
     }
 
-    private String hash(INode node, HashManager hashManager){
+    private String hash(Node node, HashManager hashManager){
         if(node instanceof DirectoryNode)
             return null;
         return hashManager.getHash(node.getFile());
