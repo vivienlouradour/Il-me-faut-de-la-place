@@ -15,9 +15,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Test extends JFrame {
-    private static String path = "D:\\test";
+    private static String path = "C:\\Users\\Vivien Louradour\\Documents\\IMT Atlantique\\Administratif";
     //private static String path = "D:\\_DocumentsSSD";
+
     public static void main(String[] args){
+        //mainTest();
+        Api api = new Api(path);
+        System.out.println(api.cleanCache());
+    }
+
+    public static void mainTest(){
         JFrame frame = new JFrame("File Browser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -69,7 +76,6 @@ public class Test extends JFrame {
         frame.setSize(640, 480);
         frame.setVisible(true);
     }
-
 
     private static class MyTreeCellRenderer extends DefaultTreeCellRenderer {
 

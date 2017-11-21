@@ -3,6 +3,8 @@ package Core;
 import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -52,7 +54,7 @@ public class Api {
         HashManager hashManager = null;
         try {
             hashManager = new HashManager();
-            HashMap<String, ArrayList<File>> hashMap = new HashMap();
+            HashMap<String, ArrayList<File>> hashMap = new HashMap<String, ArrayList<File>>();
             String hash = hash(this.customTree, hashManager);
             if(hash != null){
                 ArrayList<File> listFile = new ArrayList<>();
@@ -73,6 +75,22 @@ public class Api {
             if(hashManager != null)
                 hashManager.dispose();
         }
+    }
+
+
+    /**
+     * Nettoie le cache pour libérer de l'espace
+     * Lit le cache et enlève tous les fichiers qui ne sont pas trouvés sur la machine
+     * @return nombre de fichiers enlevés du cache
+     * @throws FileNotFoundException
+     */
+    public int cleanCache(){
+        //TODO meilleur gestion des exceptions
+        CacheManager cacheManager = null;
+        cacheManager = new CacheManager();
+        cacheManager.dispose();
+        return cacheManager.cleanCache();
+
     }
 
     //Méthodes privées

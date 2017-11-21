@@ -1,172 +1,128 @@
 package Core;
 
 import com.sun.media.jfxmediaimpl.MediaDisposer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Classe qui s'occupe de la gestion du cache
  * Format de cache : XML
  */
 class CacheManager implements MediaDisposer.Disposable{
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-    private final String cacheFileName = "cache.xml";
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    private final String cacheFileName = "hashcache.ser";
     private File cacheFile;
-    private Document xDocument;
+    private ArrayList<SerializedFile> serializedFiles;
 
-    protected CacheManager() throws IOException, ParserConfigurationException, TransformerException {
+    /**
+     * Constructeur vide
+     * Désérialise le cache s'il existe, lance une exception
+     * @throws FileNotFoundException
+     */
+    protected CacheManager(){
         String applicationDirectoryPath = ApplicationDirectoryUtilities.getProgramDirectory();
         this.cacheFile = new File(applicationDirectoryPath + File.separator + cacheFileName);
 
         //Si le fichier de cache est trouvé, on le parse
         if(cacheFile.exists()){
             try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                this.xDocument = builder.parse(this.cacheFile);
+                FileInputStream in = new FileInputStream(this.cacheFile);
+                ObjectInputStream oos = new ObjectInputStream(in);
+                this.serializedFiles = (ArrayList<SerializedFile>) oos.readObject();
             }
-            catch (Exception ex){
-                ex.printStackTrace(System.err);
+            catch (Exception e){
+                this.serializedFiles = new ArrayList<>();
             }
         }
         //Sinon  on le créé
         else{
-            init();
+            this.serializedFiles = new ArrayList<>();
         }
 
     }
 
     /**
-     * Recherche dans le cache le hash à jour d'un fichier
-     * @param file fichier à rechercher
-     * @return Hash MD5 du fichier, null si le fichier n'est pas trouvé dans le cache ou qu'il a été modifié depuis la derniere mise en cache
+     * Renvoi le hash du fichier passé en paramètre
+     * Si le fichier est présent dans le cache et que le hash est à jour : lecture du hash dans le cache
+     * Sinon : génération d'un nouveau hash + insert ou update dans le cache
+     * @param file fichier à hasher
+     * @return Hash MD5 du fichier, null si erreur de lecture
      */
     protected String getHashAndUpdateCache(File file){
-        Node node;
+        String hash;
+        String absolutePathToSearch = file.getAbsolutePath();
+        Date currentFileDate = new Date(file.lastModified());
+        //Recherche du hash dans le cache
         try {
-            node = getFileNode(file);
-
-            String hash;
-            if(node != null){
-                NamedNodeMap attributes = node.getAttributes();
-                Date lastModificationInCache = simpleDateFormat.parse(attributes.getNamedItem("lastModification").getTextContent());
-                Date lastModificationFile = new Date(file.lastModified());
-                if(!lastModificationInCache.equals(lastModificationFile))
-                    hash = updateHash(file, node);
-                else
-                    hash = node.getAttributes().getNamedItem("hash").getTextContent();
+            //Lance une NoSuchElementException si lrien n'est trouvé dans le cache
+            SerializedFile cachedFile = this.serializedFiles.stream()
+                    .filter(listFile -> listFile.absolutePath.equals(absolutePathToSearch))
+                    .findFirst()
+                    .get();
+            if(cachedFile.lastModification.equals(currentFileDate))
+                hash = cachedFile.hash;
+            else {
+                hash = HashManager.hashFile(file);
+                cachedFile.hash = hash;
             }
-            else{
-                hash = insertHash(file);
-            }
-            return hash;
         }
-        catch (ParseException e){
-            return null;
+        //Génération d'un nouveau hash et insertion dans le cache
+        catch (NoSuchElementException e){
+            hash = HashManager.hashFile(file);
+            //hash == null en cas d'erreur de lecture du fichier
+            if(hash != null)
+                this.serializedFiles.add(new SerializedFile(absolutePathToSearch, hash, new Date(file.lastModified())));
         }
-    }
-
-    private String insertHash(File file){
-        String newHash = HashManager.hashFile(file);
-        Element newFileNode = xDocument.createElement("fichier");
-        newFileNode.setAttribute("absolutePath", file.getAbsolutePath());
-        newFileNode.setAttribute("hash", newHash);
-        newFileNode.setAttribute("lastModification", getLastModifiedFormat(file));
-        xDocument.getDocumentElement().appendChild(newFileNode);
-
-        return newHash;
-    }
-
-    private String updateHash(File file, Node nodeToUpdate){
-        String newHash = HashManager.hashFile(file);
-        nodeToUpdate.getAttributes().getNamedItem("hash").setTextContent(newHash);
-        nodeToUpdate.getAttributes().getNamedItem("lastModification").setTextContent(getLastModifiedFormat(file));
-        return newHash;
-    }
-
-
-
-    /**
-     * Créer et initialise un fichier de cache
-     */
-    private void init() throws ParserConfigurationException, TransformerException{
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-        this.xDocument = docBuilder.newDocument();
-        Element rootElement = this.xDocument.createElement("fichiers");
-        this.xDocument.appendChild(rootElement);
+        return hash;
     }
 
     /**
-     * Renvoi le noeud du cache corespondant au fichier, null s'il n'est pas présent dans le cache
-     * @param file
-     * @return le Noeud XML du fichier
+     * Nettoie le cache pour libérer de l'espace
+     * Lit le cache et enlève tous les fichiers qui ne sont pas trouvés sur la machine
+     * @return faux si aucun fichier n'a été nettoyé (cache n'existe pas ou aucun fichier à nettoyer)
      */
-    private Node getFileNode(File file){
-        Element root = this.xDocument.getDocumentElement();
-        XPathFactory xpf = XPathFactory.newInstance();
-        XPath path = xpf.newXPath();
-        String fileAbsolutePath = file.getAbsolutePath();
-        String expression = "//fichiers/fichier[@absolutePath=\"" + fileAbsolutePath + "\"]";
-        Node node;
-        try {
-            node = (Node)path.evaluate(expression, root, XPathConstants.NODE);
-            return node;
-        }
-        catch (XPathExpressionException e){
-            e.printStackTrace(System.err);
-            return null;
-        }
-
-
+    protected boolean cleanCache(){
+        int nbFilesClear = 0;
+        Iterator<SerializedFile> iterator = this.serializedFiles.iterator();
+        boolean hasRemoved = this.serializedFiles.removeIf(serializedFile -> new File(serializedFile.absolutePath).exists());
+        return hasRemoved;
     }
-
 
     /**
-     * Retourne la date de derniere modification d'un fichier sous le format yyyyMMddHHmmss
-     * @return
+     * Enregistre les chagements dans le cache
      */
-    private String getLastModifiedFormat(File file){
-        return simpleDateFormat.format(file.lastModified());
-    }
-
     @Override
     public void dispose() {
         //Enregistrement des changements
         try {
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(xDocument);
+            FileOutputStream out = new FileOutputStream(this.cacheFile);
+            ObjectOutputStream oos = new ObjectOutputStream(out);
+            oos.writeObject(this.serializedFiles);
+            oos.flush();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
+    }
 
-            StreamResult result = new StreamResult(this.cacheFile);
-            transformer.transform(source, result);
-        }
-        catch (TransformerConfigurationException e) {
-            e.printStackTrace(System.err);
-        } catch (TransformerException e) {
-            e.printStackTrace(System.err);
-        }
+
+}
+
+class SerializedFile implements Serializable{
+    public String absolutePath;
+    public String hash;
+    public Date lastModification;
+
+    SerializedFile(String absolutePath, String hash, Date lastModification){
+        this.absolutePath = absolutePath;
+        this.hash = hash;
+        this.lastModification = lastModification;
     }
 }
