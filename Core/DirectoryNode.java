@@ -3,6 +3,9 @@ package Core;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * Représente un noeud répertoire
+ */
 public class DirectoryNode extends Node {
     private ArrayList<Node> childs;
 

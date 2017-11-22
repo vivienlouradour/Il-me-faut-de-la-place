@@ -4,12 +4,12 @@ import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * @author Vivien Louradour
+ * "Point d'entrée" de l'API
  */
 public class Api {
     private Node customTree;
@@ -50,12 +50,16 @@ public class Api {
         return  getModelTree(filtres);
     }
 
+    /**
+     * Retourne une HashMap des doublons présents dans l'arborescence
+     * @return Hashmap, clé = hash, ArraryList = liste de File ayant le même hash (doublons)
+     */
     public HashMap<String, ArrayList<File>> getDoublons(){
         HashManager hashManager = null;
         try {
             hashManager = new HashManager();
             HashMap<String, ArrayList<File>> hashMap = new HashMap<String, ArrayList<File>>();
-            String hash = hash(this.customTree, hashManager);
+            String hash = hashManager.getHash(this.customTree);
             if(hash != null){
                 ArrayList<File> listFile = new ArrayList<>();
                 listFile.add(this.customTree.getFile());
@@ -81,10 +85,10 @@ public class Api {
     /**
      * Nettoie le cache pour libérer de l'espace
      * Lit le cache et enlève tous les fichiers qui ne sont pas trouvés sur la machine
-     * @return nombre de fichiers enlevés du cache
+     * @return faux si aucun fichier n'a été nettoyé (cache n'existe pas ou aucun fichier à nettoyer)
      * @throws FileNotFoundException
      */
-    public int cleanCache(){
+    public boolean cleanCache(){
         //TODO meilleur gestion des exceptions
         CacheManager cacheManager = null;
         cacheManager = new CacheManager();
@@ -99,7 +103,7 @@ public class Api {
         if(childNodes == null)
             return;
         for (Node childNode : childNodes) {
-            String hash = hash(childNode, hashManager);
+            String hash = hashManager.getHash(childNode);
             if(hash != null){
                 if(hashMap.containsKey(hash))
                     hashMap.get(hash).add(childNode.getFile());
@@ -111,11 +115,5 @@ public class Api {
             }
             hashChilds(childNode ,hashMap, hashManager);
         }
-    }
-
-    private String hash(Node node, HashManager hashManager){
-        if(node instanceof DirectoryNode)
-            return null;
-        return hashManager.getHash(node.getFile());
     }
 }

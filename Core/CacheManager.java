@@ -1,11 +1,7 @@
 package Core;
 
 import com.sun.media.jfxmediaimpl.MediaDisposer;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,7 +14,7 @@ import java.util.NoSuchElementException;
  */
 class CacheManager implements MediaDisposer.Disposable{
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-    private final String cacheFileName = "hashcache.ser";
+    private final String cacheFileName = "hash_cache.ser";
     private File cacheFile;
     private ArrayList<SerializedFile> serializedFiles;
 
@@ -115,6 +111,9 @@ class CacheManager implements MediaDisposer.Disposable{
 
 }
 
+/**
+ * Cette classe est utilisée pour représenter un fichier dans le cache
+ */
 class SerializedFile implements Serializable{
     public String absolutePath;
     public String hash;

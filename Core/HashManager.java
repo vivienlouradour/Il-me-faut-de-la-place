@@ -31,13 +31,14 @@ class HashManager implements MediaDisposer.Disposable{
     /**
      * Retourne le hash du fichier passé en paramètre
      * Récupère la valeur dans le cache si elle existe et que le fichier n'a pas été modifié, sinon calcule le hash + mise à jour du fichier cache
-     * @param file fichier à hasher
+     * @param fileNode fichier à hasher
      * @return le Hash MD5 du fichier "file"
      */
-    protected String getHash(File file){
+    protected String getHash(Node fileNode){
         //Récupère le hash du fichier dans le cache s'il existe
-        String hash = this.cacheManager.getHashAndUpdateCache(file);
-        return hash;
+        if(fileNode instanceof DirectoryNode)
+            return null;
+        return this.cacheManager.getHashAndUpdateCache(fileNode.getFile());
     }
 
     /**
@@ -59,10 +60,9 @@ class HashManager implements MediaDisposer.Disposable{
             }
             byte[] hashValue = md.digest();
             return String.format(Locale.ROOT, "%032x", new BigInteger(1, hashValue));
-            //return new String(hashValue, Charset.forName("UTF-8"));
         }
         catch (FileNotFoundException e){
-            System.out.println("Hash impossible : Le fichier \"" + file.getAbsolutePath() + "\" est en cours d'utilisation. Le fichier est ignoré pour la recherche de doublon");
+            System.err.println("Hash impossible : Le fichier \"" + file.getAbsolutePath() + "\" est en cours d'utilisation. Le fichier est ignoré pour la recherche de doublon");
             return null;
         }
         catch (Exception ex){
@@ -79,7 +79,6 @@ class HashManager implements MediaDisposer.Disposable{
             }
         }
     }
-
 
     @Override
     public void dispose() {

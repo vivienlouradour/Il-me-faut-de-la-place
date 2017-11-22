@@ -3,6 +3,9 @@ package Core;
 import java.io.File;
 import java.net.URISyntaxException;
 
+/**
+ * Classe permettant de récupérer le chemin vers la racine de l'application
+ */
 class ApplicationDirectoryUtilities
 {
     protected static String getProgramDirectory()

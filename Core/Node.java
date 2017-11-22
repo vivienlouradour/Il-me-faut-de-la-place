@@ -3,6 +3,9 @@ package Core;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * Classe abstraite représenter un noeud de l'arborescence (fichier ou répertoire)
+ */
 public abstract class Node{
     private File file;
     private DirectoryNode parent;

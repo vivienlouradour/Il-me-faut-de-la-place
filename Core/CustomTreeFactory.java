@@ -2,6 +2,9 @@ package Core;
 
 import java.io.File;
 
+/**
+ * Permet de créer l'arborescence de fichier (Node) à partir d'un chemin
+ */
 class CustomTreeFactory {
     protected static Node create(String racine){
         Node rootNode;
@@ -9,7 +12,6 @@ class CustomTreeFactory {
         //Si le répertoire indiqué en argument n'existe pas, lance une exception
         if(!fileRoot.exists())
             throw new IllegalArgumentException("Le fichier spécifié n'existe pas");
-
         //Si la racine est un fichier, on se contente de créer le FileNode.
         if(fileRoot.isFile())
             rootNode = new FileNode(fileRoot);
