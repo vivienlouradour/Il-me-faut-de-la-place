@@ -10,18 +10,19 @@ import java.util.NoSuchElementException;
 
 /**
  * Classe qui s'occupe de la gestion du cache
- * Format de cache : XML
+ * Format de cache : sérialisation d'une liste d'objets
  */
 class CacheManager implements MediaDisposer.Disposable{
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     private final String cacheFileName = "hash_cache.ser";
     private File cacheFile;
+    /**
+     * Contenu du cache (initialisé dans le constructeur et vide si cache absent ou corrompu)
+     */
     private ArrayList<SerializedFile> serializedFiles;
 
     /**
      * Constructeur vide
-     * Désérialise le cache s'il existe, lance une exception
-     * @throws FileNotFoundException
+     * Désérialise le cache s'il existe
      */
     protected CacheManager(){
         String applicationDirectoryPath = ApplicationDirectoryUtilities.getProgramDirectory();
@@ -93,7 +94,7 @@ class CacheManager implements MediaDisposer.Disposable{
     }
 
     /**
-     * Enregistre les chagements dans le cache
+     * Enregistre les changements dans le cache
      */
     @Override
     public void dispose() {
@@ -115,9 +116,9 @@ class CacheManager implements MediaDisposer.Disposable{
  * Cette classe est utilisée pour représenter un fichier dans le cache
  */
 class SerializedFile implements Serializable{
-    public String absolutePath;
-    public String hash;
-    public Date lastModification;
+    String absolutePath;
+    String hash;
+    Date lastModification;
 
     SerializedFile(String absolutePath, String hash, Date lastModification){
         this.absolutePath = absolutePath;

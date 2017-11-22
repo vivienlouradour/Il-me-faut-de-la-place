@@ -13,7 +13,7 @@ public class FileNode extends Node {
     }
 
     @Override
-    protected ArrayList<Node> getChilds() {
+    public ArrayList<Node> getChilds() {
         return null;
     }
 

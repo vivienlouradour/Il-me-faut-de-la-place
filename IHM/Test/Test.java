@@ -15,13 +15,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Test extends JFrame {
-    private static String path = "C:\\Users\\Vivien Louradour\\Documents\\IMT Atlantique\\Administratif";
-    //private static String path = "D:\\_DocumentsSSD";
+    private static String path = "D:\\test";
 
     public static void main(String[] args){
-        //mainTest();
-        Api api = new Api(path);
-        System.out.println(api.cleanCache());
+        mainTest();
     }
 
     public static void mainTest(){
@@ -58,15 +55,18 @@ public class Test extends JFrame {
         FileFilter filtre = new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                return pathname.getName().endsWith(".mp3");
+                return !pathname.getName().endsWith(".txt");
             }
         };
         DefaultTreeModel treeModelFiltered = api.getModelTree(filtre);
         System.out.println("Temps de construction du treemodel avec filtres: " + (System.currentTimeMillis() - debut));
         System.out.println("******************************************************");
 
+        //Nettoyage du cache (utile si le fichier cache devient trop volumineux)
+        api.cleanCache();
+
         //Construction de l'IHM de test
-        JTree tree = new JTree(treeModel);
+        JTree tree = new JTree(treeModelFiltered);
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new MyTreeCellRenderer());
         JScrollPane scrollPane = new JScrollPane(tree);

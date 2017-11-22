@@ -8,6 +8,10 @@ import java.net.URISyntaxException;
  */
 class ApplicationDirectoryUtilities
 {
+    /**
+     *
+     * @return chemin absolu de la racine de l'application (fonctionne pour un projet et un .jar)
+     */
     protected static String getProgramDirectory()
     {
         if (runningFromJAR())

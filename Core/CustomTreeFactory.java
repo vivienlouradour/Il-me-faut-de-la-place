@@ -3,7 +3,7 @@ package Core;
 import java.io.File;
 
 /**
- * Permet de créer l'arborescence de fichier (Node) à partir d'un chemin
+ * Classe permetant de créer l'arborescence de fichier (Node) à partir d'un chemin
  */
 class CustomTreeFactory {
     protected static Node create(String racine){

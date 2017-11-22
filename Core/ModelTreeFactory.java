@@ -7,6 +7,11 @@ import java.util.ArrayList;
 
 class ModelTreeFactory {
 
+    /**
+     * * Créer un DefaultTreeModel à partir du customTree, en y appliquant une liste de filtres
+     * @param rootNode racine du customTree
+     * @return
+     */
     protected static DefaultTreeModel createTreeModel(Node rootNode){
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootNode);
 
@@ -15,6 +20,12 @@ class ModelTreeFactory {
         return new DefaultTreeModel(root);
     }
 
+    /**
+     * Créer un DefaultTreeModel à partir du customTree, en y appliquant une liste de filtres
+     * @param rootNode racine du customTree
+     * @param filtres liste de filtres à appliquer à l'arbre
+     * @return
+     */
     protected static DefaultTreeModel createTreeModelWithFilters(Node rootNode, ArrayList<FileFilter> filtres){
         DefaultMutableTreeNode root = null;
 
@@ -51,8 +62,10 @@ class ModelTreeFactory {
         for (Node child : childs) {
             if(acceptNode(child, filtres)){
                 DefaultMutableTreeNode subNode = new DefaultMutableTreeNode(child);
-                treeNode.add(subNode);
                 createModelTreeChild(child, subNode, filtres);
+                //Ajoute le noeud seulement si c'est un fichier OU que c'est un répertoire non vide
+                if(child instanceof FileNode || subNode.children().hasMoreElements())
+                    treeNode.add(subNode);
             }
         }
     }

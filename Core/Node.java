@@ -30,10 +30,10 @@ public abstract class Node{
     public long getTotalLength(){
         return this.totalLength;
     }
-    protected DirectoryNode getParent() {
+
+    public DirectoryNode getParent() {
         return parent;
     }
-
 
     protected void setParent(DirectoryNode parentNode){
         this.parent = parentNode;
@@ -43,7 +43,7 @@ public abstract class Node{
         this.totalLength = totalLength;
     }
 
-    abstract protected ArrayList<Node> getChilds();
+    abstract public ArrayList<Node> getChilds();
 
     @Override
     public String toString(){

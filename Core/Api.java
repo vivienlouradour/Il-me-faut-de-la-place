@@ -16,6 +16,7 @@ public class Api {
 
     /**
      * Initialise l'instance à partir de la racine donnée en paramètre
+     * Parcours récursif de l'arborescence de fichiers et construction de l'arbre.
      * @param racine racine de l'arborescence
      */
     public Api(String racine){
@@ -98,6 +99,13 @@ public class Api {
     }
 
     //Méthodes privées
+
+    /**
+     * Fonction de hash récursive
+     * @param node Noeud root
+     * @param hashMap HashMap de doublons à remplir
+     * @param hashManager instance de HashManager
+     */
     private void hashChilds(Node node, HashMap<String, ArrayList<File>> hashMap, HashManager hashManager){
         ArrayList<Node> childNodes = node.getChilds();
         if(childNodes == null)
