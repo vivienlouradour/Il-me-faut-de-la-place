@@ -23,7 +23,7 @@ class HashManager implements MediaDisposer.Disposable{
     /**
      * Constructeur vide
      */
-    protected HashManager() throws IOException, ParserConfigurationException, TransformerException {
+    protected HashManager() throws IOException, TransformerException {
         this.cacheManager = new CacheManager();
     }
 

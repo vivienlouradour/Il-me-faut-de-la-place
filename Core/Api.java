@@ -87,7 +87,6 @@ public class Api {
      * Nettoie le cache pour libérer de l'espace
      * Lit le cache et enlève tous les fichiers qui ne sont pas trouvés sur la machine
      * @return faux si aucun fichier n'a été nettoyé (cache n'existe pas ou aucun fichier à nettoyer)
-     * @throws FileNotFoundException
      */
     public boolean cleanCache(){
         //TODO meilleur gestion des exceptions

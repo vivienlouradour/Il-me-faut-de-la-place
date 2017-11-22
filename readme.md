@@ -21,11 +21,11 @@ Chaque noeud du treeModel porte une instance de `Core.FileNode` ou `Core.Directo
 Le treeModel peut être construit tel quel (même arborescence que le customTree) ou en appliquant des filtres implémentant l'interface `java.io.FileFilter`.
 
 ## Implémentation du cache
-Afin d'éviter de hasher plusieurs fois des fichiers inchangé, un cache est utilisé pour mémoriser les hash.  
-A chaque recherche de doublons, si le fichier est n'est pas présent ou pas à jour dans le cache, le hash est calculé puis inséré dans le cache.  
+Afin d'éviter de hasher plusieurs fois des fichiers inchangés, un cache est utilisé pour mémoriser les hash.  
+A chaque recherche de doublons, si le fichier n'est pas présent ou pas à jour dans le cache, le hash est (re)calculé puis mis à jour/inséré dans le cache.  
 Sinon, le hash est juste récupéré dans le cache.  
 Ce fichier s'appelle `cache_hash.ser` et est créé à la racine du projet.  
-Une méthode permet de nettoyer le cash : tous les fichiers présents dans le cache mais pas dans l'arborescence de la machine sera supprimé du cache.
+Une méthode permet de nettoyer le cash : tous les fichiers présents dans le cache mais pas dans l'arborescence de la machine seront supprimés du cache.
 
 
 
