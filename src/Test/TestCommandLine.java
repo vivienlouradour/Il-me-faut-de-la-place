@@ -23,28 +23,8 @@ public class TestCommandLine {
     private static String regex = null;
     private static String racine = null;
 
-    /*
     public static void main(String[] args) {
-        args = new String[]{
-                "-r",
-                "-w"
 
-
-        };
-        test(args);
-        String test= "test";
-    }
-*/
-    public static void main(String[] args) {
-        /*
-        args = new String[]{
-                "-r",
-                "D:\\test",
-                "-w",
-                "-t",
-                "-p"
-        };
-        */
         if(args.length == 0){
             printHelp();
             return;
