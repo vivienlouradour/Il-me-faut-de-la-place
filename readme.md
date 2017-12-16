@@ -6,7 +6,7 @@
 Version minimum java : 8
 
 Documentation détaillée [disponibles ici](/doc/designBackground.md)  
-Javadoc [disponibles ici](/doc/javadoc/index.html)
+Javadoc [disponibles ici](/doc/javadoc)
 
 ## Liste des fonctionnalités fournies par l'API : 
 + Créer une arborescence à partir d'une racine
@@ -15,6 +15,7 @@ Javadoc [disponibles ici](/doc/javadoc/index.html)
   + Gestion d'un cache pour les doublons pour éviter de les recalculer à chaque fois
   + Possibilité de "nettoyer" le cache lorsqu'il devient trop lourd
 + Récupération du poids totale d'un fichier dans l'arbre
++ Stockage des erreurs pour un éventuel affichage dans l'IHM 
 
 Les détails des choix d'implémentation sont [disponibles ici](/doc/designBackground.md)
 
@@ -29,6 +30,7 @@ Liste des arguments :
 + -w : affiche le poids total de l'arborescence
 + -p : affiche la structure de l'arborescence
 + -t : affiche le temps d'éxecution
++ -e : affiche les erreurs qui se sont produites au cours de l'exécution
 
 
 

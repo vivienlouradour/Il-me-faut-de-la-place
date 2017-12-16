@@ -12,6 +12,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -23,7 +24,7 @@ class HashManager implements MediaDisposer.Disposable{
     /**
      * Constructeur vide
      */
-    protected HashManager() throws IOException, TransformerException {
+    protected HashManager() {
         this.cacheManager = new CacheManager();
     }
 
@@ -62,11 +63,23 @@ class HashManager implements MediaDisposer.Disposable{
             return String.format(Locale.ROOT, "%032x", new BigInteger(1, hashValue));
         }
         catch (FileNotFoundException e){
-            System.err.println("Hash impossible : Le fichier \"" + file.getAbsolutePath() + "\" est en cours d'utilisation. Le fichier est ignoré pour la recherche de doublon");
+            ErrorHandler.getInstance().addError(
+                    new Error(
+                            new Date(),
+                            e,
+                            "Hash impossible : Le fichier \"" + file.getAbsolutePath() + "\" est en cours d'utilisation. Le fichier est ignoré pour la recherche de doublon"
+                    )
+            );
             return null;
         }
         catch (Exception ex){
-            ex.printStackTrace(System.err);
+            ErrorHandler.getInstance().addError(
+                    new Error(
+                            new Date(),
+                            ex,
+                            "Hash du fichier \"" + file.getAbsolutePath() + "\" impossible. Le fichier est ignoré pour la recherche de doublon"
+                    )
+            );
             return null;
         }
         finally {
@@ -75,7 +88,6 @@ class HashManager implements MediaDisposer.Disposable{
                     inputStream.close();
             }
             catch (Exception ex){
-                ex.printStackTrace(System.err);
             }
         }
     }

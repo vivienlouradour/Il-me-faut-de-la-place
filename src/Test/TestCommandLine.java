@@ -3,7 +3,7 @@ package Test;
 
 import Core.Api;
 import Core.DirectoryNode;
-import Core.FileNode;
+import Core.Error;
 import Core.Node;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -13,6 +13,7 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class TestCommandLine {
@@ -20,6 +21,7 @@ public class TestCommandLine {
     private static boolean printDoublons = false;
     private static boolean printExecutionTime = false;
     private static boolean printArborescence = false;
+    private static boolean printErrors = false;
     private static String regex = null;
     private static String racine = null;
 
@@ -30,55 +32,7 @@ public class TestCommandLine {
             return;
         }
 
-        for(int i = 0; i < args.length; i++){
-            if(args[i].charAt(0) != '-') {
-                printHelp();
-                return;
-            }
-            switch (args[i]){
-                case "-help" :
-                case "-h" :
-                    printHelp();
-                    return;
-                case "-d":
-                    printDoublons = true;
-                    break;
-                case "-w":
-                    printRootSize = true;
-                    break;
-                case "-t":
-                    printExecutionTime = true;
-                    break;
-                case "-p":
-                    printArborescence = true;
-                    break;
-                case "-r" :
-                    try{
-                        racine = args[i+1];
-                        i++;
-                    }
-                    catch (ArrayIndexOutOfBoundsException ex){
-                        System.out.println("/!\\ argument " + args[i] + " invalide.");
-                        printHelp();
-                        return;
-                    }
-                    break;
-                case "-f":
-                    try{
-                        regex = args[i+1];
-                        i++;
-                    }
-                    catch (ArrayIndexOutOfBoundsException ex){
-                        System.out.println("/!\\ argument " + args[i] + " invalide.");
-                        printHelp();
-                        return;
-                    }
-                    break;
-                default:
-                    printHelp();
-                    return;
-            }
-        }
+        parseArguments(args);
 
         if(racine == null) {
             printHelp();
@@ -138,6 +92,11 @@ public class TestCommandLine {
             printArborescence(treeModel);
         }
 
+        //Affichage des erreurs
+        if(printErrors){
+            printErrors(api.getErrorHandler().getErrorsCollection());
+        }
+
         //Affichage du temps d'exécution
         if(printExecutionTime){
             System.out.println("****** Temps d'éxecution *******");
@@ -155,7 +114,8 @@ public class TestCommandLine {
         System.out.println(" * -d : affiche les doublons contenus dans l'arborescence de fichiers");
         System.out.println(" * -w : affiche le poids total de l'arborescence");
         System.out.println(" * -p : affiche la structure de l'arborescence");
-        System.out.println(" * -t : affiche le temps d'éxecution");
+        System.out.println(" * -t : affiche le temps d'exécution");
+        System.out.println(" * -e : affiche les erreurs qui se sont produites au cours de l'exécution");
         System.out.println();
     }
 
@@ -178,6 +138,68 @@ public class TestCommandLine {
             System.out.println(escape + node.getFile().getName() + " : " + node.getTotalLength() / 1000000.0 + "Mo");
             if(node instanceof DirectoryNode)
                 escape += "--\\";
+        }
+        System.out.println();
+    }
+
+    private static void printErrors(List<Error> errors){
+        System.out.println("****** Liste des erreurs ******");
+        errors.forEach(error -> System.out.println(error.toString()));
+        System.out.println();
+    }
+
+    private static void parseArguments(String[] args){
+        for(int i = 0; i < args.length; i++){
+            if(args[i].charAt(0) != '-') {
+                printHelp();
+                return;
+            }
+            switch (args[i]){
+                case "-help" :
+                case "-h" :
+                    printHelp();
+                    return;
+                case "-d":
+                    printDoublons = true;
+                    break;
+                case "-w":
+                    printRootSize = true;
+                    break;
+                case "-t":
+                    printExecutionTime = true;
+                    break;
+                case "-p":
+                    printArborescence = true;
+                    break;
+                case "-e":
+                    printErrors = true;
+                    break;
+                case "-r" :
+                    try{
+                        racine = args[i+1];
+                        i++;
+                    }
+                    catch (ArrayIndexOutOfBoundsException ex){
+                        System.out.println("/!\\ argument " + args[i] + " invalide.");
+                        printHelp();
+                        return;
+                    }
+                    break;
+                case "-f":
+                    try{
+                        regex = args[i+1];
+                        i++;
+                    }
+                    catch (ArrayIndexOutOfBoundsException ex){
+                        System.out.println("/!\\ argument " + args[i] + " invalide.");
+                        printHelp();
+                        return;
+                    }
+                    break;
+                default:
+                    printHelp();
+                    return;
+            }
         }
     }
 }

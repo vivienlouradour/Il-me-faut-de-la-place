@@ -18,6 +18,7 @@ public class Api {
      * Initialise l'instance à partir de la racine donnée en paramètre
      * Parcours récursif de l'arborescence de fichiers et construction de l'arbre.
      * @param racine racine de l'arborescence
+     * @throws IllegalArgumentException
      */
     public Api(String racine) throws IllegalArgumentException{
         this.customTree = CustomTreeFactory.create(racine);
@@ -57,29 +58,23 @@ public class Api {
      */
     public HashMap<String, ArrayList<File>> getDoublons(){
         HashManager hashManager = null;
-        try {
-            hashManager = new HashManager();
-            HashMap<String, ArrayList<File>> hashMap = new HashMap<String, ArrayList<File>>();
-            String hash = hashManager.getHash(this.customTree);
-            if(hash != null){
-                ArrayList<File> listFile = new ArrayList<>();
-                listFile.add(this.customTree.getFile());
-                hashMap.put(hash, listFile);
-            }
-            hashChilds(this.customTree, hashMap, hashManager);
 
-            //On enlève tous les "non-doublons"
-            hashMap.entrySet().removeIf(e ->  e.getValue().size() <= 1);
-            return hashMap;
+        hashManager = new HashManager();
+        HashMap<String, ArrayList<File>> hashMap = new HashMap<String, ArrayList<File>>();
+        String hash = hashManager.getHash(this.customTree);
+        if(hash != null){
+            ArrayList<File> listFile = new ArrayList<>();
+            listFile.add(this.customTree.getFile());
+            hashMap.put(hash, listFile);
         }
-        catch (Exception ex){
-            ex.printStackTrace(System.err);
-            return null;
-        }
-        finally {
-            if(hashManager != null)
-                hashManager.dispose();
-        }
+        hashChilds(this.customTree, hashMap, hashManager);
+
+        //On enlève tous les "non-doublons"
+        hashMap.entrySet().removeIf(e ->  e.getValue().size() <= 1);
+
+
+        hashManager.dispose();
+        return hashMap;
     }
 
 
@@ -94,7 +89,16 @@ public class Api {
         cacheManager = new CacheManager();
         cacheManager.dispose();
         return cacheManager.cleanCache();
+    }
 
+    /**
+     * Retourne l'unique instance du Singleton ErrorHandler.
+     * Celui-ci contient les erreurs survenues pendant l'execution, afin de pouvoir les afficher.
+     * Il est possible d'y rajouter des erreurs.
+     * @return
+     */
+    public ErrorHandler getErrorHandler(){
+        return ErrorHandler.getInstance();
     }
 
     //Méthodes privées

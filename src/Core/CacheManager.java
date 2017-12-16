@@ -105,7 +105,14 @@ class CacheManager implements MediaDisposer.Disposable{
             oos.writeObject(this.serializedFiles);
             oos.flush();
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            ErrorHandler.getInstance().addError(
+                    new Error(
+                            new Date(),
+                            e,
+                            "Erreur lors de l'enregistrement du cache. Les changements dans le cache n'ont pas pu être enregistré."
+                    )
+            );
+
         }
     }
 
