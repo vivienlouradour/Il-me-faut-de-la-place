@@ -1,7 +1,7 @@
 # Il me faut de la place  - 1ère partie
 **Vivien Louradour - IMT Atlantique FIL A1**  
 *Date de rendu : 22.11.2017*  
-*Code utilisé par Cédric Garcia pour la deuxième partie*
+`*Code utilisé par Cédric Garcia pour la deuxième partie*`
 
 Version minimum java : 8
 
@@ -22,7 +22,7 @@ Les détails des choix d'implémentation sont [disponibles ici](/doc/designBackg
 ## Lancement du ".jar"
 Le fichier `Il-me-faut-de-la-place.jar` permet de tester les principales fonctionnalitées du projet en ligne de commande.  
 On le lance grâce à la commande `java -jar il-me-faut-de-la-place.jar arguments`   
-Liste des arguments : 
+#####Liste des arguments :
 + -h ou -help : affiche l'aide (annule tous les autres arguments)
 + -r <root_path> : chemin vers le repertoire à analyser (argument obligatoire)
 + -f <regex> : applique un filtre à l'arborescence qui valide l'expression régulière regex. (Non valable pour le calcul de doublons)

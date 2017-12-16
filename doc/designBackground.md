@@ -1,8 +1,6 @@
-#Il me faut de la place - 1ère Partie
-## Compte rendu
-[logo]: http://www.imt-atlantique.fr/sites/default/files/Images/Ecole/charte-graphique/IMT_Atlantique_logo_RVB_Baseline_400x272.jpg "logo IMT Atlantique"
-1. Définition de "l'API" avec le groupe
-2. Choix 
+# Il me faut de la place - 1ère Partie
+## 1. Définition de "l'API" avec le groupe
+## 2. Choix 
 
 ## Utilisation de l'API
 La seule classe à utiliser pour développer l'IHM sera `Core.Api`.  
