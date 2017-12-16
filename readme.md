@@ -1,7 +1,7 @@
 # Il me faut de la place  - 1ère partie
 **Vivien Louradour - IMT Atlantique FIL A1**  
 *Date de rendu : 22.11.2017*  
-`*Code utilisé par Cédric Garcia pour la deuxième partie*`
+*`Code utilisé par Cédric Garcia pour la deuxième partie`*
 
 Version minimum java : 8
 
@@ -22,7 +22,7 @@ Les détails des choix d'implémentation sont [disponibles ici](/doc/designBackg
 ## Lancement du ".jar"
 Le fichier `Il-me-faut-de-la-place.jar` permet de tester les principales fonctionnalitées du projet en ligne de commande.  
 On le lance grâce à la commande `java -jar il-me-faut-de-la-place.jar arguments`   
-#####Liste des arguments :
+##### Liste des arguments :
 + -h ou -help : affiche l'aide (annule tous les autres arguments)
 + -r <root_path> : chemin vers le repertoire à analyser (argument obligatoire)
 + -f <regex> : applique un filtre à l'arborescence qui valide l'expression régulière regex. (Non valable pour le calcul de doublons)
@@ -31,6 +31,12 @@ On le lance grâce à la commande `java -jar il-me-faut-de-la-place.jar argument
 + -p : affiche la structure de l'arborescence
 + -t : affiche le temps d'éxecution
 + -e : affiche les erreurs qui se sont produites au cours de l'exécution
+
+## Utilisation de l'API pour l'IHM
+La seule classe à utiliser pour développer l'IHM sera `Core.Api`.  
+Celle-ci est instanciée avec un chemin vers un répertoire (ou fichier), et créer à ce moment-là un arbre représentant l'arborescence ayant comme racine le répertoire(ou fichier) passé en paramètre.  
+A partir de cette arborescence, il est possible d'appeler plusieurs méthodes renvoyant des `TreeModel`.  
+Voir exemple d'utilisation dans les classes `Test.TestIhm` et `Test.TestCommandLine`.  
 
 
 

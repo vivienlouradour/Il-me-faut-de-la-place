@@ -1,12 +1,11 @@
 # Il me faut de la place - 1ère Partie
+Ce fichier détaillera les choix d'implémentations effectués, et l'architecture du code.  
 ## 1. Définition de "l'API" avec le groupe
-## 2. Choix 
+## 2. Choix d'implémentation
+### 2.1 ad
+### 
 
-## Utilisation de l'API
-La seule classe à utiliser pour développer l'IHM sera `Core.Api`.  
-Celle-ci est instanciée avec un chemin vers un répertoire (ou fichier), et créer à ce moment-là un arbre représentant l'arborescence ayant comme racine le répertoire(ou fichier) passé en paramètre.  
-A partir de cette arborescence, il est possible d'appeler plusieurs méthodes renvoyant des `TreeModel`.  
-Voir exemple d'utilisation dans la classe `Test.TestIhm`.  
+
 
 ## Représentation objet de l'arborescence de fichiers
 #### CustomTree
