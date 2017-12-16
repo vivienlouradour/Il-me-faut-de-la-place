@@ -6,7 +6,7 @@ import java.io.File;
  * Classe permetant de créer l'arborescence de fichier (Node) à partir d'un chemin
  */
 class CustomTreeFactory {
-    protected static Node create(String racine){
+    protected static Node create(String racine) throws IllegalArgumentException{
         Node rootNode;
         File fileRoot = new File(racine);
         //Si le répertoire indiqué en argument n'existe pas, lance une exception

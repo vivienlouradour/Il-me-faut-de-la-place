@@ -19,7 +19,7 @@ public class Api {
      * Parcours récursif de l'arborescence de fichiers et construction de l'arbre.
      * @param racine racine de l'arborescence
      */
-    public Api(String racine){
+    public Api(String racine) throws IllegalArgumentException{
         this.customTree = CustomTreeFactory.create(racine);
     }
 

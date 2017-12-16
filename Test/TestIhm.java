@@ -1,4 +1,4 @@
-package IHM.Test;
+package Test;
 
 import Core.Api;
 import Core.DirectoryNode;
@@ -14,7 +14,7 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Test extends JFrame {
+public class TestIhm extends JFrame {
     private static String path = "D:\\test";
 
     public static void main(String[] args){
