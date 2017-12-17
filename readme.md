@@ -8,6 +8,17 @@ Version minimum java : 8
 Documentation détaillée [disponibles ici](/doc/designBackground.md)  
 Javadoc [disponibles ici](/doc/javadoc)
 
+## Contexte
+Ce projet fait parti du cours "Actualisation des Compétences en Développement et Conception" de première année en filière Ingénierie Locigielle de l'Institut Mines-Télécom.  
+Il s'agit de développer une application multi-plateforme, capable de scanner une arborescence de fichier, afin de libérer de l'espace.  
+Le projet est structuré en deux parties : chacun développe la première partie, puis un échange de code est effectué et nous développons la deuxième partie à partir du code d'un binôme. 
+#### Partie 1 : backend
+Il s'agit de fournir l'ensemble des fonctionnalités nécessaire au projet, sous forme d'une API.
+#### Partie 2 : IHM  
+La deuxième partie consiste à développer une interface graphique s'appuyant sur l'API développé dans la 1ère partie.  
+  
+Ce repository git contient le code et le descriptif de la première partie du projet.
+
 ## Liste des fonctionnalités fournies par l'API : 
 + Créer une arborescence à partir d'une racine
 + Possibilité d'appliquer des filtres à cette arborescence
