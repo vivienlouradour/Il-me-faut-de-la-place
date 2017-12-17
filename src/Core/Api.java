@@ -3,7 +3,6 @@ package Core;
 import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -57,9 +56,7 @@ public class Api {
      * @return Hashmap, clé = hash, ArraryList = liste de File ayant le même hash (doublons)
      */
     public HashMap<String, ArrayList<File>> getDoublons(){
-        HashManager hashManager = null;
-
-        hashManager = new HashManager();
+        HashManager hashManager = new HashManager();
         HashMap<String, ArrayList<File>> hashMap = new HashMap<String, ArrayList<File>>();
         String hash = hashManager.getHash(this.customTree);
         if(hash != null){
@@ -76,7 +73,6 @@ public class Api {
         hashManager.dispose();
         return hashMap;
     }
-
 
     /**
      * Nettoie le cache pour libérer de l'espace
